@@ -20,11 +20,7 @@ policy. Missing: stop and say to run `/ship:adopt`.
 
 ## 2. Brief every issue
 
-Run `/ship:brief` for each. Collect the flags. Show one table:
-
-```
-| Issue | Title | Branch | Flags |
-```
+Run `/ship:brief` for each. Collect the flags.
 
 ### 2a. Pick the worker model
 
@@ -40,6 +36,8 @@ The reviewer is the check on the worker, so this is a cost dial. When in
 doubt, sonnet. Show the pick in the Model column of the table and explain
 any haiku pick in one clause, so a wrong rule gets corrected rather than
 overridden each time.
+
+Then show one table:
 
 ```
 | Issue | Title | Branch | Model | Flags |
