@@ -1,0 +1,16 @@
+{
+  "name": "josephdaw",
+  "owner": {
+    "name": "Joseph Daw"
+  },
+  "plugins": [
+    {
+      "name": "ship",
+      "source": "./plugins/ship",
+      "description": "Delegate a GitHub issue to a worker, review the PR with a higher tier model, and land it under the repo's merge policy.",
+      "version": "0.1.0",
+      "category": "workflow"
+    }
+  ],
+  "description": "Joseph Daw's Claude Code plugins. One plugin per concern."
+}
