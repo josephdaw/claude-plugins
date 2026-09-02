@@ -7,7 +7,7 @@ allowed-tools: Bash(gh:*), Bash(git:*), Agent, SendMessage, Read, Grep, Glob
 
 Land each PR in `$ARGUMENTS`. Run independent PRs in parallel. `--rounds`
 caps fix rounds; default 2. `--review` forces where the review runs; by
-default land decides per PR (step 2).
+default land decides per PR (step 3).
 
 Read the repo's CLAUDE.md `## Harness` section first for merge policy,
 default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
@@ -18,7 +18,15 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    with the failing job's output as the finding. Do not run the reviewer
    on a red PR; it wastes an opus call on something the worker can see.
 
-2. Review. One checklist, `/ship:review-pr`, two places to run it:
+2. Spec drift. The brief was a snapshot. Compare the issue's `updatedAt`
+   and its latest comment time (`gh issue view N --json updatedAt,comments`)
+   with the PR's `createdAt`. If the issue changed after the PR was opened,
+   or after the worker was briefed if you know that time, tell the reviewer
+   in its prompt: "Issue N was edited after the brief. The live body is the
+   spec. Walk every What to build, Test plan, and Acceptance item and name
+   each one the PR misses." A missed item is a blocking finding.
+
+3. Review. One checklist, `/ship:review-pr`, two places to run it:
    - `self`: you follow the checklist here, in your own context. Cheap
      when the diff is small and your context is already warm.
    - `fork`: launch the `ship:reviewer` agent (Agent tool, subagent_type
@@ -31,7 +39,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    new route or external call. Say which you chose and why in the report.
    `--review` overrides. Either way the result is a VERDICT line.
 
-3. Fix round, when the verdict is CHANGES or CI is red, while rounds
+4. Fix round, when the verdict is CHANGES or CI is red, while rounds
    remain:
    - If the worker that opened the PR is still reachable (a subagent from
      this session), `SendMessage` it: "Review posted on PR <n>. Address
@@ -44,7 +52,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    - Rounds exhausted with CHANGES still standing: stop, report the last
      review, and leave the PR open. Do not merge.
 
-4. Land, when the verdict is APPROVE and CI is green:
+5. Land, when the verdict is APPROVE and CI is green:
    - merge policy `auto`: `gh pr merge <n> --squash --delete-branch`. The
      squash subject must be the PR title; confirm it is in Conventional
      Commits form before merging, since the release tooling reads it.

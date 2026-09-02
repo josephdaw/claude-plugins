@@ -8,7 +8,7 @@
       "name": "ship",
       "source": "./plugins/ship",
       "description": "Delegate a GitHub issue to a worker, review the PR with a higher tier model, and land it under the repo's merge policy.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "category": "workflow"
     }
   ],
