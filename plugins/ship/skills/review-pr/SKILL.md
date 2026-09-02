@@ -1,14 +1,16 @@
 ---
 name: review-pr
-description: Review one pull request against its issue spec and the repo's rules, post findings on the PR, and return APPROVE or CHANGES. Runs in the reviewer agent on opus. Use when asked to review a PR or as the review step of land.
+description: The review checklist. Review one pull request against its issue spec and the repo's rules, post findings on the PR, and return APPROVE or CHANGES. Runs in whatever context calls it: inline in the orchestrator for a small diff, or inside the ship:reviewer agent (opus, fresh context) for anything larger or riskier. Use when asked to review a PR or as the review step of land.
 argument-hint: <pr-number>
-context: fork
-agent: ship:reviewer
 allowed-tools: Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh pr checks:*), Bash(gh pr review:*), Bash(gh pr comment:*), Bash(gh issue view:*), Bash(git:*), Bash(pnpm:*), Bash(npm:*), Read, Grep, Glob
 ---
 
 Review PR #$ARGUMENTS. A cheaper model wrote it. Find what is wrong before a
 merge does.
+
+If you are the orchestrator reviewing inline, you share context with the
+brief you wrote. Read the diff as a stranger would: start from the issue's
+acceptance criteria, not from what you expected the worker to do.
 
 ## 1. Load the spec and the rules
 

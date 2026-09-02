@@ -1,12 +1,13 @@
 ---
 name: land
 description: Take an open PR to merged (or to a human's queue): wait for CI, run the reviewer, route fixes back to a worker, then merge or hand over under the repo's merge policy, and clean up the worktree. Use after a worker reports a PR.
-argument-hint: <pr-number> [pr-number ...] [--rounds N]
+argument-hint: <pr-number> [pr-number ...] [--rounds N] [--review self|fork]
 allowed-tools: Bash(gh:*), Bash(git:*), Agent, SendMessage, Read, Grep, Glob
 ---
 
 Land each PR in `$ARGUMENTS`. Run independent PRs in parallel. `--rounds`
-caps fix rounds; default 2.
+caps fix rounds; default 2. `--review` forces where the review runs; by
+default land decides per PR (step 2).
 
 Read the repo's CLAUDE.md `## Harness` section first for merge policy,
 default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
@@ -17,7 +18,18 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    with the failing job's output as the finding. Do not run the reviewer
    on a red PR; it wastes an opus call on something the worker can see.
 
-2. Review. Run `/ship:review-pr <n>`. It returns a VERDICT line.
+2. Review. One checklist, `/ship:review-pr`, two places to run it:
+   - `self`: you follow the checklist here, in your own context. Cheap
+     when the diff is small and your context is already warm.
+   - `fork`: launch the `ship:reviewer` agent (Agent tool, subagent_type
+     `ship:reviewer`) with "Follow /ship:review-pr for PR <n>". Fresh
+     context on opus, so it does not share the blind spots of the session
+     that briefed the work.
+   Default `fork`. Choose `self` only when all of these hold: under about
+   150 changed lines (`gh pr diff <n> --stat`), no file under an auth,
+   permission, proxy, schema, migration, payment, or payroll path, and no
+   new route or external call. Say which you chose and why in the report.
+   `--review` overrides. Either way the result is a VERDICT line.
 
 3. Fix round, when the verdict is CHANGES or CI is red, while rounds
    remain:
@@ -51,7 +63,7 @@ One block per PR:
 ```
 PR <n>: merged | awaiting human | blocked after <k> rounds
 Issue: #N closed | still open (why)
-Review: APPROVE | CHANGES, <blocking count> blocking
+Review: APPROVE | CHANGES, <blocking count> blocking, by self | fork (why)
 Worktree: removed | kept at <path>
 ```
 

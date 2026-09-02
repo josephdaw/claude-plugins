@@ -8,10 +8,10 @@ allowed-tools: Bash(gh:*), Bash(git:*), Bash(scripts/new-worktree.sh:*), Bash(ls
 Delegate each issue in `$ARGUMENTS` to its own worker. You coordinate. You
 never enter a worktree and never write code.
 
-Flags: `--model` sets the worker model (default sonnet; haiku for a
-mechanical change such as a rename, copy edit, or config). `--mode` picks
-the launch (default local). `--yes` skips the confirmation and treats a
-flagged issue as skipped rather than asking.
+Flags: `--model` forces the worker model for every issue. Without it,
+delegate picks per issue (step 2a) and says so. `--mode` picks the launch
+(default local). `--yes` skips the confirmation and treats a flagged issue
+as skipped rather than asking.
 
 ## 1. Read the Harness section
 
@@ -24,6 +24,25 @@ Run `/ship:brief` for each. Collect the flags. Show one table:
 
 ```
 | Issue | Title | Branch | Flags |
+```
+
+### 2a. Pick the worker model
+
+Per issue, unless `--model` was given:
+
+- `haiku` when the issue is labelled `docs`, `chore`, or `mechanical`, or
+  its scope is a rename, a copy change, a config value, a dependency bump,
+  or moving code without changing it, and the acceptance names no
+  behaviour a test would have to prove.
+- `sonnet` otherwise.
+
+The reviewer is the check on the worker, so this is a cost dial. When in
+doubt, sonnet. Show the pick in the Model column of the table and explain
+any haiku pick in one clause, so a wrong rule gets corrected rather than
+overridden each time.
+
+```
+| Issue | Title | Branch | Model | Flags |
 ```
 
 Ask once, batched, how to handle flagged rows (brief anyway, research only,
@@ -61,7 +80,7 @@ in a fenced block, for a terminal session the user opens in that path.
 
 ```
 ### #<n> <title>
-Worker: local sonnet (running) | cloud prompt above | paste prompt above
+Worker: local <model> (running; why haiku, if haiku) | cloud prompt above | paste prompt above
 Worktree: <path>
 Branch: <name>
 ```

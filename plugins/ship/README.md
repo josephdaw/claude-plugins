@@ -27,7 +27,7 @@ Each piece also stands alone:
 | Agent | Model | Used by |
 |-------|-------|---------|
 | `worker` | sonnet | delegate, land (fix rounds) |
-| `reviewer` | opus | land, or `/ship:review-pr` directly |
+| `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
 ## What a repo must provide
 
@@ -54,11 +54,18 @@ ci gate is the one command a worker must pass before pushing.
 worktree is optional. Without it, delegate uses `git worktree add` beside
 the checkout.
 
-## Worker model
+## Which model does what
 
-Workers default to sonnet. Pass `--model haiku` to delegate for a mechanical
-issue (rename, copy change, config). The reviewer stays on opus regardless,
-because the review is the check on the cheaper model.
+Workers: delegate picks per issue. Haiku for a mechanical change (rename,
+copy, config, dependency bump, a `docs` or `chore` label), sonnet for
+anything with behaviour to prove. `--model` forces it. The pick is printed
+so a wrong rule gets fixed here rather than overridden each time.
+
+Review: `review-pr` is one checklist. land runs it in one of two places.
+`fork` launches the `reviewer` agent on opus in a fresh context, the
+default. `self` runs it inline in the orchestrator, chosen only for a small
+diff that touches nothing risky, because an inline review shares the
+blind spots of the session that briefed the work. `--review` forces either.
 
 ## Conventions the skills assume
 
