@@ -65,6 +65,13 @@ URL in the shape ship-issue specifies."
 Do not use the Agent tool's own worktree isolation; the worktree already
 exists at the path in the brief.
 
+Workers run in the background. Never end your turn while one is still
+running: a headless session (Talos, `claude -p`) exits the moment you
+send a message with no tool call, and every running worker is killed with
+its uncommitted work lost. After launching, block on each worker with
+TaskOutput (or wait for its completion notification) and keep the turn
+open until all have reported. Land PRs as they arrive, between waits.
+
 `cloud`: print, per issue, the same prompt in a fenced block for the user
 to start a cloud session with. The cloud session installs this plugin from
 the repo's `.claude/settings.json`, so the prompt needs no extra setup. Note
@@ -84,7 +91,8 @@ Branch: <name>
 ```
 
 When local workers report back, run `/ship:land <pr>` for each PR. Do not
-wait for all to finish before landing the first.
+wait for all to finish before landing the first. Do not finish the
+turn while any worker is still running.
 
 If the repo keeps a roadmap or planning file, you update it after merge.
 Workers never touch it.
