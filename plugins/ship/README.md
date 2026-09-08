@@ -56,6 +56,27 @@ ci gate is the one command a worker must pass before pushing.
 worktree is optional. Without it, delegate uses `git worktree add` beside
 the checkout.
 
+## Setting a repo up
+
+`/ship:adopt` does all of this. The checklist, for reading or for doing by
+hand:
+
+1. `.claude/settings.json` declares the marketplace and enables the plugin
+   (the JSON block above the Harness table in adopt). Committed, not local.
+2. `.claude/hooks/session-start.sh`, cloud only, installs the plugin. Cloud
+   sessions read project settings but do not install an external-source
+   plugin on their own, so without this the ship skills are missing on the
+   web. The same script is the place for anything else a cloud container
+   needs: a Node version, a dependency install, a database for the tests.
+   Skip with `--no-cloud-hook` if a repo does not want hooks.
+3. A `## Harness` section in CLAUDE.md with the merge policy, ci gate,
+   default branch, and optional worktree script.
+4. Issues carry a `ready` label when specified, and a `talos` label to
+   hand-pick them for an unattended night.
+
+If ship skills are missing in a cloud session, check 2 first: the hook
+must be committed on the branch the session cloned.
+
 ## Which model does what
 
 Workers: delegate picks per issue. Haiku for a mechanical change (rename,

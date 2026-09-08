@@ -1,7 +1,7 @@
 ---
 name: adopt
-description: Set a repo up for the ship plugin: write the marketplace and plugin entries into .claude/settings.json and add the Harness section to CLAUDE.md. Use when a repo has no Harness section or when delegate, brief, or land say to run it.
-argument-hint: [--merge-policy auto|human]
+description: Set a repo up for the ship plugin: write the marketplace and plugin entries into .claude/settings.json, add a cloud SessionStart hook that installs the plugin, and add the Harness section to CLAUDE.md. Use when a repo has no Harness section, when ship skills are missing in a cloud session, or when delegate, brief, or land say to run it.
+argument-hint: [--merge-policy auto|human] [--no-cloud-hook]
 allowed-tools: Bash(git:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
 ---
 
@@ -25,7 +25,63 @@ If `.gitignore` ignores `.claude/` wholesale, narrow it to
 `.claude/settings.local.json` and `.claude/worktrees/` so the shared file
 is committed.
 
-## 2. Detect
+## 2. Cloud SessionStart hook
+
+Skip this step with `--no-cloud-hook`.
+
+Cloud sessions (claude.ai/code) read the project settings above but do
+not install a plugin from an external marketplace source, so the ship
+skills are missing there until something installs them. A SessionStart
+hook that only runs in cloud does it.
+
+If `.claude/hooks/session-start.sh` does not exist, create it, executable:
+
+```bash
+#!/bin/bash
+#
+# SessionStart hook for Claude Code on the web. Exits at once elsewhere.
+# Cloud sessions read .claude/settings.json but do not install a plugin
+# from an external marketplace source, so install ship here.
+# See: https://code.claude.com/docs/en/discover-plugins.md
+set -euo pipefail
+
+if [ "${CLAUDE_CODE_REMOTE:-}" != "true" ]; then
+  exit 0
+fi
+
+if command -v claude >/dev/null 2>&1; then
+  claude plugin marketplace add josephdaw/claude-plugins --scope user >/dev/null 2>&1 \
+    && echo "session-start: josephdaw marketplace ready" \
+    || echo "session-start: marketplace add failed or already present, continuing" >&2
+  claude plugin install ship@josephdaw --scope user -y >/dev/null 2>&1 \
+    && echo "session-start: ship plugin ready" \
+    || echo "session-start: ship plugin install failed or already present, continuing" >&2
+else
+  echo "session-start: claude CLI not on PATH, skipping ship plugin install" >&2
+fi
+```
+
+If the script already exists, add the plugin block after its cloud guard
+and leave the rest alone. Then merge a SessionStart entry into
+`.claude/settings.json`, keeping any hooks already there:
+
+```json
+{
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command",
+        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh" } ] }
+    ]
+  }
+}
+```
+
+Repo-specific setup belongs in the same script after the plugin block:
+a Node version the container lacks, a dependency install, services the
+tests need. Look at the repo's CLAUDE.md for what the ci gate needs and
+add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
+
+## 3. Detect
 
 - default branch: `git symbolic-ref refs/remotes/origin/HEAD`, else main.
 - worktree script: `scripts/new-worktree.sh` if present, else none.
@@ -36,7 +92,7 @@ is committed.
   in production or relied on by anyone? Yes means `human`, no means `auto`.
   Recommend `human` when unsure.
 
-## 3. Write the Harness section
+## 4. Write the Harness section
 
 Append to CLAUDE.md, or replace an existing `## Harness` section:
 
@@ -59,6 +115,6 @@ reviewer approves. human: a person reviews and merges.
 
 Omit the worktree row when there is no script.
 
-## 4. Report
+## 5. Report
 
-Show the diff of both files. Do not commit; the user commits.
+Show the diff of every file touched. Do not commit; the user commits.
