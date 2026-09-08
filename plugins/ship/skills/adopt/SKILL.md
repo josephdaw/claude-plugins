@@ -2,7 +2,7 @@
 name: adopt
 description: Set a repo up for the ship plugin: write the marketplace and plugin entries into .claude/settings.json, add a cloud SessionStart hook that installs the plugin, and add the Harness section to CLAUDE.md. Use when a repo has no Harness section, when ship skills are missing in a cloud session, or when delegate, brief, or land say to run it.
 argument-hint: [--merge-policy auto|human] [--no-cloud-hook]
-allowed-tools: Bash(git:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(chmod:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
 ---
 
 Set the current repo up for `ship`.
