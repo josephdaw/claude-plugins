@@ -73,8 +73,11 @@ TaskOutput (or wait for its completion notification) and keep the turn
 open until all have reported. Land PRs as they arrive, between waits.
 
 `cloud`: print, per issue, the same prompt in a fenced block for the user
-to start a cloud session with. The cloud session installs this plugin from
-the repo's `.claude/settings.json`, so the prompt needs no extra setup. Note
+to start a cloud session with. Cloud reads the repo's `.claude/settings.json`
+but does not auto-install an external-source plugin, so the repo's
+SessionStart hook must run `claude plugin install ship@josephdaw` (see
+utm-platform's `.claude/hooks/session-start.sh`). The prompt itself needs
+no extra setup. Note
 the worktree section does not apply there: the cloud session has its own
 checkout, so replace it with "Branch: <name> off <default>".
 
