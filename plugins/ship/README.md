@@ -23,6 +23,7 @@ Each piece also stands alone:
 | `land` | orchestrator | Wait for CI, run review-pr, route fixes, merge or hand over, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
 | `adopt` | anyone | Set a repo up: settings.json and the `## Harness` section |
+| `commit-format` | anyone | Release Please conventional commit and PR description format |
 | `worktree` | anyone | Create a worktree in any repo, handling env files; delegate's fallback when there is no worktree script |
 
 | Agent | Model | Used by |
