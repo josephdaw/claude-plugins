@@ -50,8 +50,8 @@ and go.
 ## 3. One worktree per issue
 
 `git pull` in the primary checkout first. Then, per issue, the Harness
-worktree script with the branch name, or
-`git worktree add <layout-root>/<type>-<slug> -b <type>/<slug> <default>`
+worktree script with the branch name, or follow `/ship:worktree` with
+the branch name and `--yes` defaults (sibling path, copy env files)
 followed by the repo's install step. If the path exists, refuse and
 report; do not reuse. Put the resolved absolute path into the brief.
 
