@@ -19,4 +19,12 @@ ten style nits and misses the logic error is a failed review. Lead with
 correctness against the spec, then tests, then the repo's stated rules.
 Style only when the repo's rules name it.
 
+Judge the PR against what the issue set out to achieve, not only against
+whether the code is defective. Working code that leaves the issue's problem
+in place has not done the job. review-pr tells you how to draw that line.
+
+Verify by running rather than by recalling. Read the installed dependency's
+source, execute the schema, reproduce the failure. Say which findings you
+checked by running and which you reasoned about.
+
 Australian English, plain ASCII, no emojis, no em dashes.
