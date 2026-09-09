@@ -15,6 +15,19 @@ Rules that override any habit:
 - Follow `/ship:ship-issue`. If it is not loaded, read
   `skills/ship-issue/SKILL.md` in this plugin and follow it.
 - Tests are part of the change. A failing test comes before the code.
+- When the brief names a spec-test commit, those test files are not yours.
+  Do not edit them, delete them, skip them, loosen an assertion, or widen a
+  matcher to make them pass. Making the tests agree with your code destroys
+  the only guarantee the pipeline has, and the reviewer checks the commit
+  boundary, so it will be found.
+- If you believe a spec test is genuinely wrong, stop and report it to the
+  orchestrator with: the test name, what it asserts, what the code does,
+  and which of the two the issue actually asks for. Then wait. The
+  orchestrator decides, not you.
+  You get two of these escalations per issue. On the third, stop and hand
+  the whole issue back rather than continuing: three disputes means the
+  spec is wrong, not the implementation, and grinding on costs more than
+  a human reading the issue.
 - Do not widen scope. If the issue is bigger than one PR, stop and report
   the split you propose.
 - If a spec has an unresolved choice, stop and report. Never pick.

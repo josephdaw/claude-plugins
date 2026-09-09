@@ -55,6 +55,29 @@ the branch name and `--yes` defaults (sibling path, copy env files)
 followed by the repo's install step. If the path exists, refuse and
 report; do not reuse. Put the resolved absolute path into the brief.
 
+## 3b. Spec tests first, on the full tier
+
+Docs-only and runtime-free `chore` issues skip this. Everything else gets a
+spec-test pass before any implementation.
+
+Launch the `ship:spec-tests` agent (Agent tool, `subagent_type:
+ship:spec-tests`) in the issue's worktree. It writes the failing tests that
+encode the issue's behaviour, proves they fail for the right reason, and
+commits them alone.
+
+Two of its outcomes are not "carry on":
+
+- Spec gaps found. It stopped because the issue is wrong or has an unmade
+  choice. Do not launch a worker. Fix the issue, or bring the choice to the
+  human. An issue that specifies the wrong behaviour will otherwise be
+  implemented correctly and reviewed as correct, and the error survives all
+  the way to production.
+- No red proof. If it could not make the tests fail for the right reason,
+  the tests do not test the thing. Send it back before spending a worker.
+
+Pass the test commit SHA and the test file paths into the worker's brief.
+The worker may not change those files, and the reviewer checks that.
+
 ## 4. Launch
 
 `local`: one `Agent` call per issue, in the same message so they run in

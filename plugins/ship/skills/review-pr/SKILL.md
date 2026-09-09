@@ -45,6 +45,19 @@ reviews are wrong.
    test fail if the change were reverted? Pick one and check by reading,
    or by reverting locally if a worktree is available. A test that mirrors
    the code is not a test.
+
+   When the PR has a spec-test commit, two checks are mechanical, so do
+   them rather than judge them:
+
+   - The test files have not changed since that commit:
+     `git diff <test-sha> HEAD -- <test paths>`. Any change is blocking
+     unless the PR body records that the orchestrator approved it and why.
+     An implementer that edits the tests to pass has removed the guarantee,
+     and a green suite then means nothing.
+   - The tests were genuinely red first: check out the test commit, run
+     them, confirm they fail for the absence of the behaviour rather than a
+     missing import. This turns "would it fail if reverted" from a guess
+     into evidence, so do not skip it because the tests are green now.
 4. Rules. The repo's stated ones only: dependency direction, file size,
    where authorisation lives, no logging of personal data, config in the
    database, and whatever else its CLAUDE.md says.
