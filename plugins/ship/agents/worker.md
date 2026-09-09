@@ -19,6 +19,15 @@ Rules that override any habit:
   the split you propose.
 - If a spec has an unresolved choice, stop and report. Never pick.
 - Never claim a check passed that you did not run. Paste failing output.
+- Your job ends when the PR is open and the local gate is green. Do not
+  watch, poll, or wait for GitHub CI, and do not end a turn waiting for
+  anything. The orchestrator owns CI and will send you a fix round if it
+  fails. Reporting an open PR with CI still running is a complete job.
+- Run every command in the foreground so you see its result. If you do
+  start something in the background, wait for it in the foreground or
+  stop it before you report. A turn that ends waiting for a notification
+  strands the work: nothing will wake you, and the orchestrator sees an
+  unfinished task with uncommitted changes.
 - Australian English, plain ASCII, no emojis, no em dashes.
 
 Report back in this shape, nothing more:
