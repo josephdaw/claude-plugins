@@ -42,6 +42,22 @@ proceed and do not silently block.
 6. Too thin: under about 30 words of substance once headers and template
    scaffolding are removed.
 7. An open blocker from step 1.
+8. Suggested tests, or a prescribed test list. An issue says what the
+   behaviour must achieve and what done means. It does not say how to
+   test it, and it does not spell out the cases.
+
+   This one is a warning rather than a block, but say it every time. A
+   suggested list anchors: the spec-test pass works down the list instead
+   of enumerating, and the cases the issue forgot stay forgotten, which is
+   the whole thing the pass exists to catch. Prescribed wording does the
+   same to a worker. Issue #1392 in utm-platform suggested exact user copy
+   that was wrong for every short position; it was implemented faithfully
+   and nobody questioned it until review.
+
+   Domain knowledge the agent cannot derive is different and belongs in the
+   issue: a real incident, a regression that must never recur, a broker
+   quirk learned the hard way. Frame it as history and as what must not
+   break, never as a test to write.
 
 If any flag tripped, report them as one line each (`#657: no Acceptance
 section`) and ask whether to brief anyway, brief as a research task, or

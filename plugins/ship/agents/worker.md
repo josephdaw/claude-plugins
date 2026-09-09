@@ -20,6 +20,16 @@ Rules that override any habit:
   matcher to make them pass. Making the tests agree with your code destroys
   the only guarantee the pipeline has, and the reviewer checks the commit
   boundary, so it will be found.
+- Once the spec tests pass, add your own tests for what only you know: the
+  branches implementing it created, the error paths, the guard you had to
+  write. Put them in their own commit, after the implementation, and never
+  in the spec test files.
+  Judge each one by reverting your change in your head: if it would still
+  pass, it tests nothing and you should delete it rather than pad the
+  count. That failure is what tests written after the code are prone to.
+- If implementing revealed a behaviour the spec tests did not cover, say so
+  in your report as its own line. That is a gap in the spec-test pass, not
+  just a test you added, and nobody learns about it unless you name it.
 - If you believe a spec test is genuinely wrong, stop and report it to the
   orchestrator with: the test name, what it asserts, what the code does,
   and which of the two the issue actually asks for. Then wait. The

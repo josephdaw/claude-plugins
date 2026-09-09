@@ -1,7 +1,7 @@
 ---
 name: delegate
 description: Delegate one or more GitHub issues to workers: brief each, make a worktree, and launch a local subagent, a cloud session, or a paste-ready prompt. The orchestrator's entry point. Use when asked to delegate, hand off, or farm out issues.
-argument-hint: <issue ...> [--model sonnet|haiku] [--mode local|cloud|paste] [--yes]
+argument-hint: <issue ...> [--model sonnet|haiku] [--test-model opus|fable] [--mode local|cloud|paste] [--yes]
 allowed-tools: Bash(gh:*), Bash(git:*), Bash(scripts/new-worktree.sh:*), Bash(ls:*), Bash(test:*), Bash(realpath:*), Agent, Read, Grep, Glob, AskUserQuestion
 ---
 
@@ -9,7 +9,8 @@ Delegate each issue in `$ARGUMENTS` to its own worker. You coordinate. You
 never enter a worktree and never write code.
 
 Flags: `--model` forces the worker model for every issue. Without it,
-delegate picks per issue (step 2a) and says so. `--mode` picks the launch
+delegate picks per issue (step 2a) and says so. `--test-model` picks the
+model for the spec-test pass (step 3b), default opus. `--mode` picks the launch
 (default local). `--yes` skips the confirmation and treats a flagged issue
 as skipped rather than asking.
 
@@ -61,7 +62,20 @@ Docs-only and runtime-free `chore` issues skip this. Everything else gets a
 spec-test pass before any implementation.
 
 Launch the `ship:spec-tests` agent (Agent tool, `subagent_type:
-ship:spec-tests`) in the issue's worktree. It writes the failing tests that
+ship:spec-tests`) in the issue's worktree, with `model` from `--test-model`
+if given.
+
+On the model: the default is opus, and fable is worth running as a measured
+experiment rather than a preference. The argument for it is not that one
+writes better tests, it is that opus reviews the PR, so an opus test pass
+shares its blind spots. A behaviour neither considers passes the whole
+pipeline unchallenged and looks like agreement rather than a gap. A
+different model at the two judgement points decorrelates them.
+
+That is a testable claim, so test it: run `--test-model fable` on a run of
+full-tier issues and record whether the reviewer finds behaviour the tests
+missed, against the same count for opus. Promote or drop it on the number,
+not on the reasoning above. It writes the failing tests that
 encode the issue's behaviour, proves they fail for the right reason, and
 commits them alone.
 

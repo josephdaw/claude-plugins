@@ -54,6 +54,10 @@ reviews are wrong.
      unless the PR body records that the orchestrator approved it and why.
      An implementer that edits the tests to pass has removed the guarantee,
      and a green suite then means nothing.
+   - Tests the worker added after the implementation get more suspicion than
+     the spec tests, not less. They were written with the code in front of
+     them, so the revert test is the only thing that separates a regression
+     test from a mirror of the implementation. Check at least one properly.
    - The tests were genuinely red first: check out the test commit, run
      them, confirm they fail for the absence of the behaviour rather than a
      missing import. This turns "would it fail if reverted" from a guess
