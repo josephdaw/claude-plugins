@@ -6,18 +6,30 @@ and land it under the repo's merge policy.
 ## The loop
 
 ```
+/ship:raise-issue             author: write the issue, spec and evidence,
+                              no test list, no unmade choice
+/ship:ready-issue 164         reviewer: check the issue against the code,
+                              then apply the ready label
 /ship:delegate 164 171        orchestrator: brief each issue, make a worktree,
-                              launch a worker (local subagent, cloud, or paste)
-    /ship:ship-issue 164      worker: brief to PR
-/ship:land 167                orchestrator: CI, review, fix loop, then merge
-                              or hand to a human, then clean up
+                              spec tests first, then launch a worker
+    /ship:spec-tests 164      opus: failing behaviour tests, committed alone
+    /ship:ship-issue 164      worker: make them pass, add its own coverage
+/ship:land 167                orchestrator: CI, review, fix loop, re-review,
+                              then merge or hand to a human, then clean up
 ```
+
+The two ends of that loop are the ones people skip and the ones that cost
+most. A wrong spec is measured against by every stage after it, so they all
+pass and the result is still wrong. A fix round that is not re-reviewed
+means the commit that merges is not the commit anyone read.
 
 Each piece also stands alone:
 
 | Skill | Who runs it | What it does |
 |-------|-------------|--------------|
-| `brief` | orchestrator | Turn an issue into a worker brief, with a readiness check |
+| `raise-issue` | author | Write an issue a spec-test pass and a worker can act on: problem, evidence, behaviour, acceptance, known regressions |
+| `ready-issue` | reviewer | Check an issue against the codebase, flag what is wrong, apply the `ready` label |
+| `brief` | orchestrator | Turn an issue into a worker brief, with a prose-only readiness backstop |
 | `ship-issue` | worker | Brief to open PR: worktree, tests, code, docs, commit, push |
 | `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings, return a verdict |
 | `land` | orchestrator | Wait for CI, run review-pr, route fixes, merge or hand over, clean up |
@@ -28,6 +40,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
+| `spec-tests` | opus | delegate, ahead of the worker; `--test-model fable` to decorrelate from the reviewer |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
@@ -92,7 +105,10 @@ blind spots of the session that briefed the work. `--review` forces either.
 
 ## Conventions the skills assume
 
-Issues carry a `ready` label once they are specified. The most recent issue
+Issues carry a `ready` label once `/ship:ready-issue` has checked them
+against the code. The label is a gate the rest of the pipeline trusts, so
+it is earned by a pass that greps for every symbol the issue names, not by
+someone reading the prose and agreeing with it. The most recent issue
 comment titled "Decisions taken" or "Spec addendum" beats the body. PR
 bodies carry `Closes #N` on its own line. Commit subjects follow Conventional
 Commits, checked by the repo, not by this plugin.

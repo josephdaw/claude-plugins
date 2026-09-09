@@ -27,6 +27,13 @@ say to run `/ship:adopt` first.
 
 ## 2. Readiness check
 
+This is a backstop, not the gate. `/ship:ready-issue` is the real check: it
+reads the issue against the code and earns the `ready` label. What follows
+catches an issue that reached delegation without that pass, and it reads
+prose only, so it cannot tell you the issue is factually wrong about the
+codebase. If an issue looks thin here, run `/ship:ready-issue` on it rather
+than briefing it anyway.
+
 Flag the task if any of these hold. Surface every flag; do not silently
 proceed and do not silently block.
 
