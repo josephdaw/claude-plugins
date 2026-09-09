@@ -26,7 +26,19 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    spec. Walk every What to build, Test plan, and Acceptance item and name
    each one the PR misses." A missed item is a blocking finding.
 
-3. Review. One checklist, `/ship:review-pr`, two places to run it:
+3. Review. How deep depends on what the PR touches.
+
+   Light: the PR changes only documentation, or is a `chore` that touches
+   no runtime code. Review inline, one pass.
+
+   Full: everything else, with no exceptions carved out for a small diff.
+   Size is not risk. A one-line change to order placement outranks a
+   thousand lines of docs.
+
+   Start coarse and only split the full tier further if it proves too slow
+   in practice, which is a measurement, not a guess.
+
+   One checklist, `/ship:review-pr`, two places to run it:
    - `self`: you follow the checklist here, in your own context. Cheap
      when the diff is small and your context is already warm.
    - `fork`: launch the `ship:reviewer` agent (Agent tool, subagent_type
@@ -52,7 +64,23 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    - Rounds exhausted with CHANGES still standing: stop, report the last
      review, and leave the PR open. Do not merge.
 
+   The re-review is not optional and it is not a skim. A fix round changes
+   the code that merges, so the previous verdict describes a commit that no
+   longer exists. Review the new head as its own diff, including any commit
+   the orchestrator wrote itself. Reviewing your own fix is not a review.
+
 5. Land, when the verdict is APPROVE and CI is green:
+
+   Before merging, check the commit you are about to merge is the one that
+   was reviewed:
+
+   ```
+   gh pr view <n> --json headRefOid -q .headRefOid
+   ```
+
+   It must equal the head the APPROVE was given on. If it moved, for any
+   reason, go back to step 3. Never merge a commit no reviewer has seen.
+
    - merge policy `auto`: `gh pr merge <n> --squash --delete-branch`. The
      squash subject must be the PR title; confirm it is in Conventional
      Commits form before merging, since the release tooling reads it.

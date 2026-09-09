@@ -65,6 +65,12 @@ Review by ship:reviewer
 
 Verdict: APPROVE | CHANGES
 
+TLDR
+Verified by running: <the claims you executed, one line>
+Verified by reading: <the claims you traced but did not execute>
+Not verified: <what nobody has checked, and what would check it>
+Merge risk if wrong: <one sentence on what breaks in production>
+
 Spec: <n of m criteria met; name any partly met or missing>
 
 Findings (blocking):
@@ -77,6 +83,12 @@ Findings (should fix, not blocking). Each carries FIX NOW or FILE:
 Checked and fine: <one line naming the risky parts you traced and found
 sound, so the human knows what was covered>
 ```
+
+The TLDR is written for someone who will not read the rest and will merge
+on it. Keep it to those four lines. "Not verified" is the most valuable of
+them: say plainly what no one has checked, because a reader who is not
+reading the code themselves has no other way to know. Never leave it empty
+to look thorough. If everything really was verified, say so and name how.
 
 ## What blocking means
 
