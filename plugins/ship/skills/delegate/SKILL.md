@@ -65,17 +65,18 @@ Launch the `ship:spec-tests` agent (Agent tool, `subagent_type:
 ship:spec-tests`) in the issue's worktree, with `model` from `--test-model`
 if given.
 
-On the model: the default is opus, and fable is worth running as a measured
-experiment rather than a preference. The argument for it is not that one
-writes better tests, it is that opus reviews the PR, so an opus test pass
-shares its blind spots. A behaviour neither considers passes the whole
-pipeline unchallenged and looks like agreement rather than a gap. A
-different model at the two judgement points decorrelates them.
+On the model: the default is fable, with opus reviewing the PR (decided
+2026-09-10). The argument is not that one writes better tests. It is that
+the reviewer and the test writer are the two judgement points, and if they
+share a model they share blind spots: a behaviour neither considers passes
+the whole pipeline unchallenged and looks like agreement. Fable on tests
+and opus on review is the cheaper way round, since tests are written once
+per issue and the review runs once per round.
 
-That is a testable claim, so test it: run `--test-model fable` on a run of
-full-tier issues and record whether the reviewer finds behaviour the tests
-missed, against the same count for opus. Promote or drop it on the number,
-not on the reasoning above. It writes the failing tests that
+That is a testable claim, so measure it: over the next ten full-tier
+issues, count how often the reviewer finds behaviour the tests missed,
+against the same count for opus tests. Keep or drop it on the number.
+It writes the failing tests that
 encode the issue's behaviour, proves they fail for the right reason, and
 commits them alone.
 

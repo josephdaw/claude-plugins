@@ -12,7 +12,7 @@ and land it under the repo's merge policy.
                               then apply the ready label
 /ship:delegate 164 171        orchestrator: brief each issue, make a worktree,
                               spec tests first, then launch a worker
-    /ship:spec-tests 164      opus: failing behaviour tests, committed alone
+    /ship:spec-tests 164      fable: failing behaviour tests, committed alone
     /ship:ship-issue 164      worker: make them pass, add its own coverage
 /ship:land 167                orchestrator: CI, review, fix loop, re-review,
                               then merge or hand to a human, then clean up
@@ -31,8 +31,8 @@ Each piece also stands alone:
 | `ready-issue` | reviewer | Check an issue against the codebase, flag what is wrong, apply the `ready` label |
 | `brief` | orchestrator | Turn an issue into a worker brief, with a prose-only readiness backstop |
 | `ship-issue` | worker | Brief to open PR: worktree, tests, code, docs, commit, push |
-| `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings, return a verdict |
-| `land` | orchestrator | Wait for CI, run review-pr, route fixes, merge or hand over, clean up |
+| `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings as FIX, DEFER (issue created), or NOTE, return a verdict |
+| `land` | orchestrator | Wait for CI, run review-pr, route every FIX back to the worker, merge or hand over, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
 | `adopt` | anyone | Set a repo up: settings.json and the `## Harness` section |
 | `commit-format` | anyone | Release Please conventional commit and PR description format |
@@ -40,7 +40,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
-| `spec-tests` | opus | delegate, ahead of the worker; `--test-model fable` to decorrelate from the reviewer |
+| `spec-tests` | fable | delegate, ahead of the worker; a different model from the reviewer so the two judgement points do not share blind spots. `--test-model` overrides |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
