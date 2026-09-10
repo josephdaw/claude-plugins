@@ -24,7 +24,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    or after the worker was briefed if you know that time, tell the reviewer
    in its prompt: "Issue N was edited after the brief. The live body is the
    spec. Walk every What to build, Test plan, and Acceptance item and name
-   each one the PR misses." A missed item is a blocking finding.
+   each one the PR misses." A missed item is a FIX.
 
 3. Review. How deep depends on what the PR touches.
 
@@ -55,7 +55,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    remain:
    - If the worker that opened the PR is still reachable (a subagent from
      this session), `SendMessage` it: "Review posted on PR <n>. Address
-     every blocking finding, rerun the ci gate, push, and report."
+     every FIX, rerun the ci gate, push, and report."
    - Otherwise launch a fresh `ship:worker` (Agent tool, subagent_type
      `ship:worker`) with: the worktree path and branch from the PR, the
      review comment text, and the same instruction. It works in the
@@ -99,12 +99,16 @@ One block per PR:
 ```
 PR <n>: merged | awaiting human | blocked after <k> rounds
 Issue: #N closed | still open (why)
-Review: APPROVE | CHANGES, <blocking count> blocking, by self | fork (why)
+Review: APPROVE | CHANGES, <FIX count> FIX, <DEFER issue numbers>, by self | fork (why)
 Worktree: removed | kept at <path>
 ```
 
-Then one line naming anything the reviewer marked "should fix" that was
-left, so it can become an issue rather than be forgotten.
+Then one line listing the reviewer's NOTE items, so the weekly scan can
+find them, and confirming every DEFER has an issue number.
+
+A PR opened outside this skill (a Talos salvage, a hand-written PR) gets
+this skill run on it before anyone is asked to merge. A merge with a FIX
+outstanding is how a known problem becomes an unknown one.
 
 Never merge on a red CI, a CHANGES verdict, or a `human` policy. Never
 force-push. Never delete a worktree with uncommitted changes; report it

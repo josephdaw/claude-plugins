@@ -50,7 +50,7 @@ reviews are wrong.
    them rather than judge them:
 
    - The test files have not changed since that commit:
-     `git diff <test-sha> HEAD -- <test paths>`. Any change is blocking
+     `git diff <test-sha> HEAD -- <test paths>`. Any change is a FIX
      unless the PR body records that the orchestrator approved it and why.
      An implementer that edits the tests to pass has removed the guarantee,
      and a green suite then means nothing.
@@ -90,12 +90,11 @@ Merge risk if wrong: <one sentence on what breaks in production>
 
 Spec: <n of m criteria met; name any partly met or missing>
 
-Findings (blocking):
-1. <file:line> <what is wrong, what the spec or rule says, what to do>
-
-Findings (should fix, not blocking). Each carries FIX NOW or FILE:
-1. FIX NOW <file:line> <what is wrong, what to do>
-2. FILE <proposed issue title> <one paragraph of body>
+Findings. Each is FIX, DEFER, or NOTE. Any FIX means CHANGES:
+1. FIX <file:line> <what is wrong> <the acceptance line, repo rule, or
+   trace it fails> <what to do>
+2. DEFER #<issue> <one line on why it is not this PR's to fix>
+3. NOTE <one line, no file:line needed>
 
 Checked and fine: <one line naming the risky parts you traced and found
 sound, so the human knows what was covered>
@@ -107,54 +106,55 @@ them: say plainly what no one has checked, because a reader who is not
 reading the code themselves has no other way to know. Never leave it empty
 to look thorough. If everything really was verified, say so and name how.
 
-## What blocking means
+## FIX, DEFER, or NOTE
 
-Blocking means the verdict is CHANGES.
+Three labels, one owner each. There is no "should fix, not blocking".
+Deferring work that belongs to this PR grows the backlog, so the default
+is FIX, and the worker and reviewer get as much as they can into the one
+PR.
 
-A finding is blocking if it defeats what the issue set out to achieve, not
-only if the code is defective. Name the issue's purpose in one sentence
-before you classify anything, and judge against that sentence.
+- FIX. Wrong, and this PR's to fix. Any size. Every FIX names what it is
+  wrong against: an acceptance line, a rule the repo has written down, a
+  correctness trace, or a test gap. A FIX that cannot name one is a NOTE.
+  Any FIX means the verdict is CHANGES and the fix round clears it.
+- DEFER. Real, but out of scope for this issue or in need of a decision
+  the issue did not make. You create the issue before you post the review:
+  `gh issue create` with a title, a body written from the finding, and a
+  link to the PR. The review carries the issue number. A DEFER without an
+  issue number is an incomplete review.
+- NOTE. Not wrong. Taste, a nicer name, tighter wording, ordering. One
+  short list at the end. Nothing happens to it now; a weekly scan over
+  merged PRs looks for trends.
 
-The two tests are different and the second one is the one that gets missed.
-A DLQ escalation fix whose logs claim a retry is coming on the terminal
-attempt is not defective, the audit row still lands, but the issue existed
-because failures were invisible, so it fails its own purpose and blocks.
-Copy that is wrong for short positions is not a crash, but the issue existed
-to explain something to a user, so it blocks.
+The test: would a reader of the merged code be misled, or would a user or
+operator see a wrong result? Yes is FIX. No, but the codebase is worse off
+in a way another issue should own: DEFER. Neither: NOTE.
 
-Also blocking: an acceptance criterion not met, red CI, a test that would
-pass with the change reverted, a safety finding, and scope the issue did not
-ask for.
+FIX includes things that used to slide as "not blocking":
 
-Not blocking: anything the repo has not written down as a rule, a
-preference, or work that is genuinely a separate issue rather than this one
-done badly.
+- A false claim in a comment or PR body (a version number that is not the
+  installed one, an issue number that credits the wrong PR). False
+  documentation misleads the next reader, so it is a defect.
+- A log line that misleads an operator.
+- Output that drops data under a shape the spec covers.
+- A written repo rule broken: prose style, dependency direction, file
+  size the PR made worse.
+- A test that does not test the thing: it would pass with the change
+  reverted, or it calls the unit directly instead of driving the path the
+  spec names.
+- A missing test for a behaviour the acceptance names.
+- An acceptance criterion not met, red CI, a safety finding, scope the
+  issue did not ask for, and anything that defeats the issue's purpose
+  even if the code is not defective. Name the issue's purpose in one
+  sentence before you classify anything, and judge against it.
 
-If you are unsure, ask whether a reader of the issue would say this PR did
-what they asked. If they would hesitate, it blocks.
+DEFER, for example: a defect the PR exposed but did not cause, in code it
+did not touch; a design question the issue left open; anything that would
+widen the PR past one coherent change.
 
-## Should-fix findings are fixed or filed, never dropped
+NOTE, for example: a name that could be better; wording that is correct
+but could be tighter; a pattern you prefer where the repo has no stated
+rule.
 
-Every "should fix" leaves this review in one of two states, and you say
-which for each one:
-
-- FIX NOW, when it is small, in the same files, and does not need a decision
-  the issue did not make. Default to this. The worker is already in context
-  and it is cheaper now than as a future issue nobody prioritises.
-- FILE, when it needs a decision, widens scope, or belongs to another
-  surface. Give the issue title and one paragraph of body so it can be
-  filed without rediscovering the problem.
-
-A should-fix with neither label is an incomplete review. Merging with an
-unfiled should-fix is how a known problem becomes an unknown one.
-
-Then return to the caller exactly:
-
-```
-VERDICT: APPROVE | CHANGES
-PR: <url>
-BLOCKING: <count>
-SUMMARY: <one sentence>
-```
-
-Never edit code. Never merge. Never approve a PR whose CI is red.
+You never apply a FIX yourself. The worker does, and you review the new
+head. Reviewing your own fix is not a review.
