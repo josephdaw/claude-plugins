@@ -1,6 +1,6 @@
 ---
 name: spec-tests
-description: Writes the failing tests that encode one issue's behaviour, before any implementation exists. Runs them to prove they fail for the right reason, commits them alone, and reports the case list. Launched by /ship:delegate ahead of the worker. Opus, because deciding what the behaviour is costs more judgement than implementing it.
+description: Writes the failing tests that encode one issue's behaviour, before any implementation exists. Runs them to prove they fail for the right reason, commits them alone, and reports the case list. Launched by /ship:delegate ahead of the worker. Fable by default, a different model from the opus reviewer so the two judgement points do not share blind spots.
 model: fable
 ---
 

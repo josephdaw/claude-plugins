@@ -34,6 +34,7 @@ Each piece also stands alone:
 | `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings as FIX, DEFER (issue created), or NOTE, return a verdict |
 | `land` | orchestrator | Wait for CI, run review-pr, route every FIX back to the worker, merge or hand over, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
+| `notes-scan` | Talos weekly, a routine, or anyone | Read the NOTE lines on the week's merged PRs, turn a trend into a written rule, at most one tidy-up PR |
 | `adopt` | anyone | Set a repo up: settings.json and the `## Harness` section |
 | `commit-format` | anyone | Release Please conventional commit and PR description format |
 | `worktree` | anyone | Create a worktree in any repo, handling env files; delegate's fallback when there is no worktree script |
