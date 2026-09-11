@@ -1,0 +1,12 @@
+{
+  "extraKnownMarketplaces": {
+    "josephdaw": { "source": { "source": "github", "repo": "josephdaw/claude-plugins" } }
+  },
+  "enabledPlugins": { "ship@josephdaw": true },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command",
+        "command": "$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh" } ] }
+    ]
+  }
+}
