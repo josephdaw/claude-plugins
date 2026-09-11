@@ -53,7 +53,7 @@ not in the plugin.
 
 | Setting | Value |
 |---------|-------|
-| merge policy | human |
+| merge policy | auto |
 | ci gate | claude plugin validate . && claude plugin validate plugins/ship |
 | default branch | main |
 
