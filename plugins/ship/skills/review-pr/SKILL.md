@@ -19,11 +19,14 @@ acceptance criteria, not from what you expected the worker to do.
   `gh issue view N --comments`. The latest "Decisions taken" or "Spec
   addendum" comment is the spec where it differs from the body.
 - The repo's CLAUDE.md, and whatever it names as the rulebook
-  (`docs/conventions.md`, ADRs). These are the rules you review against.
-  Do not import rules the repo has not written down.
-- Also load `<base>/../../rules/coding.md`, the plugin's shared coding
-  rules. Where the repo's CLAUDE.md and the rules file disagree, the
-  repo's CLAUDE.md wins.
+  (`docs/conventions.md`, ADRs).
+- `<base>/../../rules/coding.md`, the plugin's shared coding rules. This
+  file counts as written down: it applies to every repo whether or not
+  that repo's own CLAUDE.md mentions structure, DRY, or any of it. Where
+  the repo's CLAUDE.md and the rules file disagree, the repo's CLAUDE.md
+  wins.
+- These two sources are the rules you review against. Do not import a
+  rule beyond what they, together, have written down.
 - `gh pr checks $ARGUMENTS`. If CI is still running, wait for it. A red CI
   is a CHANGES verdict on its own, but keep reviewing so one round fixes
   everything.
