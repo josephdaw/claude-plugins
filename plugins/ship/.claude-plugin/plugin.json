@@ -1,6 +1,6 @@
 {
   "name": "ship",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "Delegate a GitHub issue to a worker, review the PR with a higher tier model, and land it under the repo's merge policy.",
   "author": {
     "name": "Joseph Daw"

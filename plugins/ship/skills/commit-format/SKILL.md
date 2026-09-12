@@ -54,13 +54,42 @@ feat(utils): update encode to support unicode
   Source-Link: googleapis/googleapis@e5eef86
 ```
 
-**PR description format (no asterisk):**
+**PR description format**
+
+This is also the squash commit body on merge (see `land` and `adopt`), so
+it is the only account of the change that reaches main. Keep it short and
+keep it true for the life of the PR, including after fix rounds.
+
+Four parts, plain sentences, no asterisk bullets:
+
+1. What changed, as behaviour a user or caller sees.
+2. How it was tested: the command run, for example the ci gate. No counts.
+3. A line starting `Not verified:` naming each acceptance line or
+   behaviour that no test or executed check proves, and how to check it by
+   hand. Write `Not verified: nothing` only when every acceptance line is
+   proven by a test or a check actually run.
+4. `Closes #N` (or `Refs #N` when the PR does not finish the issue) on its
+   own line.
+
+It never holds test counts or other numbers that change as tests or code
+change, and never an account of how the code works inside. The diff shows
+that; a stale number or a paraphrase of the diff is a claim that can go
+false without anyone updating it.
+
+**Example:**
 ```
-feat: implement comprehensive testing coverage
+feat: reject a login when the account is locked
 
-Enable 77 additional passing tests through systematic infrastructure improvements.
-Improve test coverage from 97 to 174 passing tests with behaviour-focused testing.
-Add critical path validation for authentication, database operations and API endpoints.
+Login now returns 423 with a locked-account message instead of the
+generic 401 when the account's lock flag is set. Callers see the same
+response whether the lock came from repeated failed attempts or an
+admin action.
 
-Technical improvements include fixing authentication controller issues and resolving database connection handling.
+Tested by running the ci gate.
+
+Not verified: the admin-triggered lock path, since no test seeds an
+admin-set lock. Check by hand: set a user's locked_at from the admin
+console, then attempt that user's login and confirm 423.
+
+Closes #142
 ```

@@ -69,10 +69,8 @@ Never stop short of the PR out of caution.
 16. Commit in Conventional Commits form, `<type>(<scope>): <description>`.
     Match the trailer style of `git log -5`.
 17. Push with `-u`. Open the PR with `gh pr create`. Title in Conventional
-    Commits form. Body in plain sentences, no asterisk bullets: a short
-    summary, what was tested and how, a "Not verified" line if any, and
-    `Closes #$ARGUMENTS` on its own line (`Refs #$ARGUMENTS` if the PR does
-    not finish the issue).
+    Commits form. Write the body in the PR description format `ship:commit-format`
+    defines: it is also the squash commit body, so keep to that shape.
 18. Report in this shape:
 
 ```

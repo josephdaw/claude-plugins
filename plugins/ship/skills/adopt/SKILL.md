@@ -2,7 +2,7 @@
 name: adopt
 description: Set a repo up for the ship plugin: write the marketplace and plugin entries into .claude/settings.json, add a cloud SessionStart hook that installs the plugin, and add the Harness section to CLAUDE.md. Use when a repo has no Harness section, when ship skills are missing in a cloud session, or when delegate, brief, or land say to run it.
 argument-hint: [--merge-policy auto|human] [--no-cloud-hook]
-allowed-tools: Bash(git:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(chmod:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
+allowed-tools: Bash(git:*), Bash(gh:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(chmod:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
 ---
 
 Set the current repo up for `ship`.
@@ -25,7 +25,24 @@ If `.gitignore` ignores `.claude/` wholesale, narrow it to
 `.claude/settings.local.json` and `.claude/worktrees/` so the shared file
 is committed.
 
-## 2. Cloud SessionStart hook
+## 2. Squash merge defaults
+
+`land`'s auto merge policy squashes with an explicit subject and body, but
+a human merging from the GitHub UI uses the repo's squash defaults. Set
+them to match, so either path produces the same commit on main:
+
+```
+gh api -X PATCH repos/<owner>/<repo> \
+  -f squash_merge_commit_title=PR_TITLE \
+  -f squash_merge_commit_message=PR_BODY
+```
+
+Read the current values first (`gh api repos/<owner>/<repo> --jq '.squash_merge_commit_title,.squash_merge_commit_message'`)
+so the report can show what changed. Rerunning adopt on a repo already set
+this way is a no-op: the read matches the desired value and the PATCH
+changes nothing else on the repo.
+
+## 3. Cloud SessionStart hook
 
 Skip this step with `--no-cloud-hook`.
 
@@ -81,7 +98,7 @@ a Node version the container lacks, a dependency install, services the
 tests need. Look at the repo's CLAUDE.md for what the ci gate needs and
 add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
 
-## 3. Detect
+## 4. Detect
 
 - default branch: `git symbolic-ref refs/remotes/origin/HEAD`, else main.
 - worktree script: `scripts/new-worktree.sh` if present, else none.
@@ -92,7 +109,7 @@ add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
   in production or relied on by anyone? Yes means `human`, no means `auto`.
   Recommend `human` when unsure.
 
-## 4. Write the Harness section
+## 5. Write the Harness section
 
 Append to CLAUDE.md, or replace an existing `## Harness` section:
 
@@ -115,6 +132,6 @@ reviewer approves. human: a person reviews and merges.
 
 Omit the worktree row when there is no script.
 
-## 5. Report
+## 6. Report
 
 Show the diff of every file touched. Do not commit; the user commits.

@@ -81,13 +81,40 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    It must equal the head the APPROVE was given on. If it moved, for any
    reason, go back to step 3. Never merge a commit no reviewer has seen.
 
-   - merge policy `auto`: `gh pr merge <n> --squash --delete-branch`. The
-     squash subject must be the PR title; confirm it is in Conventional
-     Commits form before merging, since the release tooling reads it.
-     Then from the primary checkout `git pull`, remove the worktree
-     (`git worktree remove <path>`, then `git branch -d` if it survives),
-     and confirm the linked issue closed (`gh issue view N --json state`).
-     If it did not, close it with a comment naming the PR.
+   Then check the description itself has not moved since the approving
+   review. The reviewer posts a plain PR comment (an IssueComment), not a
+   GitHub review (a PullRequestReview), so compare the PR's
+   `lastEditedAt` against that comment's `createdAt`:
+
+   ```
+   gh api graphql -f query='
+     query($owner:String!,$repo:String!,$n:Int!) {
+       repository(owner:$owner,name:$repo) {
+         pullRequest(number:$n) {
+           lastEditedAt
+           comments(last: 20) { nodes { author { login } body createdAt } }
+         }
+       }
+     }' -F owner=<owner> -F repo=<repo> -F n=<n>
+   ```
+
+   Find the latest comment whose body starts "Review by ship:reviewer" and
+   read its `createdAt`. If the PR's `lastEditedAt` is later, the approved
+   text is not the text about to be merged: go back to step 3 and
+   re-review the current description.
+
+   - merge policy `auto`: read the current description with
+     `gh pr view <n> --json body -q .body` into a file, then
+     `gh pr merge <n> --squash --delete-branch --subject "<PR title> (#<n>)" --body-file <that file>`.
+     The subject is the PR title plus ` (#<n>)`; confirm the title is in
+     Conventional Commits form before merging, since the release tooling
+     reads it. The body is the PR description read at merge time, verbatim
+     (no trailers such as Co-Authored-By carried over from branch commits;
+     the description is the record). Then from the primary checkout
+     `git pull`, remove the worktree (`git worktree remove <path>`, then
+     `git branch -d` if it survives), and confirm the linked issue closed
+     (`gh issue view N --json state`). If it did not, close it with a
+     comment naming the PR.
    - merge policy `human`: post a comment "Ready for human review. CI green,
      ship:reviewer approved, see review above." Do not merge. Leave the
      worktree. Report the URL for the person to pick up.
