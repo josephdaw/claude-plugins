@@ -26,6 +26,12 @@ acceptance criteria, not from what you expected the worker to do.
   everything.
 - `gh pr diff $ARGUMENTS`. Read the whole diff, then open each changed file
   in full. A diff hides the function around the change.
+- Walk every sentence of the PR description against the code at the
+  reviewed head. Check each one for two things: is it true, and does it
+  hold to the four-part shape `ship:commit-format` defines (what changed,
+  how it was tested, a "Not verified" line, `Closes`/`Refs #N`). Do this
+  on every review, including a re-review after a fix round: walk the whole
+  description again, not only the sentences that changed.
 
 Prefer running something over reasoning about it. If a claim can be checked
 by executing it, execute it: read the installed dependency's source rather
@@ -133,8 +139,12 @@ in a way another issue should own: DEFER. Neither: NOTE.
 FIX includes things that used to slide as "not blocking":
 
 - A false claim in a comment or PR body (a version number that is not the
-  installed one, an issue number that credits the wrong PR). False
-  documentation misleads the next reader, so it is a defect.
+  installed one, an issue number that credits the wrong PR, a test count,
+  or a described behaviour the code does not have). False documentation
+  misleads the next reader, so it is a defect. A PR description sentence
+  that is true but does not hold to the `ship:commit-format` shape (for
+  example it counts tests, or it is a bullet point) is a NOTE, not a FIX:
+  it misleads nobody, so it does not cost the worker a round.
 - A log line that misleads an operator.
 - Output that drops data under a shape the spec covers.
 - A written repo rule broken: prose style, dependency direction, file

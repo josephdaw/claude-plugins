@@ -35,7 +35,7 @@ Each piece also stands alone:
 | `land` | orchestrator | Wait for CI, run review-pr, route every FIX back to the worker, merge or hand over, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
 | `notes-scan` | Talos weekly, a routine, or anyone | Read the NOTE lines on the week's merged PRs, turn a trend into a written rule, at most one tidy-up PR |
-| `adopt` | anyone | Set a repo up: settings.json and the `## Harness` section |
+| `adopt` | anyone | Set a repo up: settings.json, squash merge defaults, and the `## Harness` section |
 | `commit-format` | anyone | Release Please conventional commit and PR description format |
 | `worktree` | anyone | Create a worktree in any repo, handling env files; delegate's fallback when there is no worktree script |
 
@@ -77,18 +77,24 @@ hand:
 
 1. `.claude/settings.json` declares the marketplace and enables the plugin
    (the JSON block above the Harness table in adopt). Committed, not local.
-2. `.claude/hooks/session-start.sh`, cloud only, installs the plugin. Cloud
+2. The repo's squash merge defaults, `squash_merge_commit_title` and
+   `squash_merge_commit_message`, set to `PR_TITLE` and `PR_BODY`. Without
+   this, a human merging from the GitHub UI stitches every branch commit
+   message together instead of using the PR description that was reviewed,
+   which is the failure `commit-format`'s PR description rules exist to
+   stop.
+3. `.claude/hooks/session-start.sh`, cloud only, installs the plugin. Cloud
    sessions read project settings but do not install an external-source
    plugin on their own, so without this the ship skills are missing on the
    web. The same script is the place for anything else a cloud container
    needs: a Node version, a dependency install, a database for the tests.
    Skip with `--no-cloud-hook` if a repo does not want hooks.
-3. A `## Harness` section in CLAUDE.md with the merge policy, ci gate,
+4. A `## Harness` section in CLAUDE.md with the merge policy, ci gate,
    default branch, and optional worktree script.
-4. Issues carry a `ready` label when specified, and a `talos` label to
+5. Issues carry a `ready` label when specified, and a `talos` label to
    hand-pick them for an unattended night.
 
-If ship skills are missing in a cloud session, check 2 first: the hook
+If ship skills are missing in a cloud session, check 3 first: the hook
 must be committed on the branch the session cloned.
 
 ## Which model does what
