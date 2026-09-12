@@ -19,7 +19,10 @@ result is wrong. You are the only stage that checks the spec itself.
 
 `gh issue view $ARGUMENTS` and its comments. The latest decision comment
 wins over the body. Then the repo's CLAUDE.md and whatever it names as the
-rulebook, plus its decisions log if it has one.
+rulebook, plus its decisions log if it has one. Also read
+`<base>/../../rules/coding.md`, the plugin's shared coding rules. Where
+the repo's CLAUDE.md and the rules file disagree, the repo's CLAUDE.md
+wins.
 
 ## 2. Check it against the code, do not reason from the issue alone
 
@@ -39,6 +42,14 @@ Every one of these is a command, not a judgement. Run them.
 - Prescribed user-facing copy, checked against the axes the thing varies
   on. Long and short, empty and full, first and last, one and many. Copy
   that is only true for one case is a spec bug, and it will otherwise ship.
+- Where the issue names an owning module, the repo's CLAUDE.md ownership
+  map actually lists that module against that concern. Where the issue
+  says a new module is needed, it says what the new module will own.
+- For each file the issue names, the current line count, against the
+  file cap the coding rules file and the repo's CLAUDE.md set. Flag any
+  file already at 85 percent of the cap or more. If the issue's change
+  will grow a flagged file, the split is raised first as its own issue,
+  and this issue waits on it.
 
 ## 3. Check it is one deliverable
 

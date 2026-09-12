@@ -33,6 +33,9 @@ and cover the ones that carry different behaviour.
 
 - Read the repo's CLAUDE.md and its testing conventions first. Match the
   house style for naming, placement, and fixtures. They win over this file.
+- Also read `<base>/../rules/coding.md`, the plugin's shared coding rules.
+  Where the repo's CLAUDE.md and the rules file disagree, the repo's
+  CLAUDE.md wins.
 - The tests must fail when you run them, and fail for the RIGHT reason.
   A test that errors on a missing import or a syntax error proves nothing.
   Run them, read the failures, and confirm each one fails because the

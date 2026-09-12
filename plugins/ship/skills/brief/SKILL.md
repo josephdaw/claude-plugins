@@ -23,7 +23,9 @@ For a freeform task: if it is under about ten words or has no acceptance,
 stop and ask for one paragraph of context plus acceptance criteria.
 
 Read the repo's CLAUDE.md `## Harness` section. If it is missing, stop and
-say to run `/ship:adopt` first.
+say to run `/ship:adopt` first. Also read `<base>/../../rules/coding.md`,
+the plugin's shared coding rules. Where the repo's CLAUDE.md and the
+rules file disagree, the repo's CLAUDE.md wins.
 
 ## 2. Readiness check
 

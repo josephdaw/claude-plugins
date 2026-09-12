@@ -15,7 +15,10 @@ Never stop short of the PR out of caution.
 1. Read the repo's CLAUDE.md front to back. It wins over this file. Find
    its `## Harness` section and note the ci gate, the default branch, and
    the worktree script. If CLAUDE.md or the Harness section is missing,
-   stop and report: the repo has not been set up for delegation.
+   stop and report: the repo has not been set up for delegation. Also
+   read `<base>/../../rules/coding.md`, the plugin's shared coding rules.
+   Where the repo's CLAUDE.md and the rules file disagree, the repo's
+   CLAUDE.md wins.
 2. Reply first with a block titled `Rulebook read` listing: the ci gate
    command, the commit format, any do-not-touch paths, and one convention
    from CLAUDE.md that will shape this issue. This proves the read.
@@ -57,21 +60,31 @@ Never stop short of the PR out of caution.
 13. Keep to the issue. A "while I am here" cleanup goes in a note in the PR
     body, not in the diff.
 
+## Refactor
+
+14. Tests are green. Before the verify steps, walk your own diff against
+    the Structure rules in `<base>/../../rules/coding.md`: duplicated
+    logic or literals (search the ownership map for an existing owner), a
+    missing ownership-map row, the file and function caps and the ratchet
+    baseline, and import direction. Refactor what you find with the suite
+    still green. You never edit the spec test files, here or anywhere
+    else in this skill.
+
 ## Verify
 
-14. `git fetch origin <default>` and `git rebase origin/<default>`. Resolve
+15. `git fetch origin <default>` and `git rebase origin/<default>`. Resolve
     conflicts. Do this before the first push.
-15. Run the ci gate from the Harness section. It must pass. Paste the tail
+16. Run the ci gate from the Harness section. It must pass. Paste the tail
     of a failure rather than describing it.
 
 ## Ship
 
-16. Commit in Conventional Commits form, `<type>(<scope>): <description>`.
+17. Commit in Conventional Commits form, `<type>(<scope>): <description>`.
     Match the trailer style of `git log -5`.
-17. Push with `-u`. Open the PR with `gh pr create`. Title in Conventional
+18. Push with `-u`. Open the PR with `gh pr create`. Title in Conventional
     Commits form. Write the body in the PR description format `ship:commit-format`
     defines: it is also the squash commit body, so keep to that shape.
-18. Report in this shape:
+19. Report in this shape:
 
 ```
 PR: <url>

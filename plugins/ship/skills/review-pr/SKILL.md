@@ -21,6 +21,9 @@ acceptance criteria, not from what you expected the worker to do.
 - The repo's CLAUDE.md, and whatever it names as the rulebook
   (`docs/conventions.md`, ADRs). These are the rules you review against.
   Do not import rules the repo has not written down.
+- Also load `<base>/../../rules/coding.md`, the plugin's shared coding
+  rules. Where the repo's CLAUDE.md and the rules file disagree, the
+  repo's CLAUDE.md wins.
 - `gh pr checks $ARGUMENTS`. If CI is still running, wait for it. A red CI
   is a CHANGES verdict on its own, but keep reviewing so one round fixes
   everything.
@@ -68,9 +71,12 @@ reviews are wrong.
      them, confirm they fail for the absence of the behaviour rather than a
      missing import. This turns "would it fail if reverted" from a guess
      into evidence, so do not skip it because the tests are green now.
-4. Rules. The repo's stated ones only: dependency direction, file size,
-   where authorisation lives, no logging of personal data, config in the
-   database, and whatever else its CLAUDE.md says.
+4. Rules. The repo's stated ones, plus the Structure rules in the coding
+   rules file: dependency direction, file size, where authorisation
+   lives, no logging of personal data, config in the database, and
+   whatever else the repo's CLAUDE.md says. On Structure, a duplicated
+   owner, a module missing from the ownership map, an import going the
+   wrong way, a cap breach, or a raised ratchet baseline is a FIX.
 5. Safety. Secrets in the diff, a migration that drops human-made data,
    a new route left open, participant or staff data reaching a log.
 6. Docs. The repo's maps and conventions updated where the change moved
