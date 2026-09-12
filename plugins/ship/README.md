@@ -45,6 +45,14 @@ Each piece also stands alone:
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
+## Coding rules
+
+`plugins/ship/rules/coding.md` holds the coding rules every repo is held
+to: style, DRY, error handling, commit format, PR scoping, and the
+Structure rules (file and function caps, a ratchet, import direction, an
+ownership map). Skills and agents load it by a path relative to their own
+base directory. A repo's own CLAUDE.md wins where the two disagree.
+
 ## What a repo must provide
 
 A `## Harness` section in its CLAUDE.md. The skills read it and refuse to

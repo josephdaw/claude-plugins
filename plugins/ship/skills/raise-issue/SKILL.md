@@ -11,26 +11,29 @@ who will implement it. Neither can ask you a question later.
 
 ## What the issue must carry
 
-Only the first four are always required.
+Only the first five are always required.
 
 1. The problem, in the terms of what a person cannot do or what goes wrong.
    Not the fix. "The card renders nothing when there is no suggestion, so
    the user cannot tell why" beats "add a reason field".
-2. Evidence. What was observed: real output, a log line, counts, a date, an
+2. When the issue adds behaviour, the module that owns it, taken from the
+   repo's CLAUDE.md ownership map. If no module owns it yet, say a new
+   module is needed and what it will own.
+3. Evidence. What was observed: real output, a log line, counts, a date, an
    account, a screenshot's content. This is the part nobody can reconstruct
    later and the part that survives longest. "114 credential failures at
    3/3 attempts, empty DLQ, zero audit rows, 24 to 29 June" is worth more
    than three paragraphs of description.
-3. The behaviour wanted, stated so it can be checked. What the system does
+4. The behaviour wanted, stated so it can be checked. What the system does
    afterwards, in which situations.
-4. Acceptance. What done means, as a list a reviewer can walk. Each line
+5. Acceptance. What done means, as a list a reviewer can walk. Each line
    must be decidable: someone reads it, looks at the PR, and says met or
    not met, with no interpretation.
-5. Known regressions, when there are any. A thing that broke before and
+6. Known regressions, when there are any. A thing that broke before and
    must not break again, with its history. This is domain knowledge the
    codebase does not contain and no agent can derive.
-6. Out of scope, when the issue sits next to work it must not absorb.
-7. Related issues and PRs, including anything it must land after.
+7. Out of scope, when the issue sits next to work it must not absorb.
+8. Related issues and PRs, including anything it must land after.
 
 ## What the issue must NOT carry
 
@@ -67,6 +70,11 @@ Read enough of the codebase to be accurate about what exists now. An issue
 that names a function that does not exist, or describes current behaviour
 wrongly, sends everyone downstream to the wrong place, and it is a stated
 fact rather than an obvious gap, so it is trusted.
+
+Also read `<base>/../../rules/coding.md`, the plugin's shared coding
+rules, alongside the repo's CLAUDE.md ownership map, so the module you
+name in the issue is the real owner. Where the repo's CLAUDE.md and the
+rules file disagree, the repo's CLAUDE.md wins.
 
 Do not write acceptance you cannot check yourself. If you cannot tell
 whether it would be met, neither can the reviewer.

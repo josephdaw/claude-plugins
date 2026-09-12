@@ -108,6 +108,12 @@ add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
 - merge policy: from `--merge-policy`, else ask one question: is this repo
   in production or relied on by anyone? Yes means `human`, no means `auto`.
   Recommend `human` when unsure.
+- structure check: whether the ci gate above runs anything that enforces
+  the Structure rules in the plugin's coding rules file (file or function
+  size, an import-direction lint rule, an ownership-map completeness
+  check). Look at what the ci gate actually runs; do not assume from the
+  language alone. This does not get written here: each repo wires its own
+  check with its own tools.
 
 ## 5. Write the Harness section
 
@@ -135,3 +141,8 @@ Omit the worktree row when there is no script.
 ## 6. Report
 
 Show the diff of every file touched. Do not commit; the user commits.
+
+State whether the ci gate runs a structure check, from step 4. If it does
+not, list that as a gap: the repo has no automated check for the Structure
+rules in the plugin's coding rules file, and adopt does not write one,
+because each repo uses its own tools.

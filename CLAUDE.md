@@ -22,6 +22,7 @@ Find the existing owner; do not create a parallel implementation.
 | Version match check | `scripts/check-manifest-versions.py` |
 | What each ship skill does | `plugins/ship/skills/<name>/SKILL.md` |
 | Worker, reviewer, and spec-test agents | `plugins/ship/agents/<name>.md` |
+| The coding rules every repo is held to | `plugins/ship/rules/coding.md` |
 | How to adopt and use ship | `plugins/ship/README.md` |
 | Why ship works the way it does | mnemosyne `ops/harness/ship-workflow.md` |
 
