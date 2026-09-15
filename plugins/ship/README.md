@@ -12,7 +12,7 @@ and land it under the repo's merge policy.
                               then apply the ready label
 /ship:delegate 164 171        orchestrator: brief each issue, make a worktree,
                               spec tests first, then launch a worker
-    /ship:spec-tests 164      fable: failing behaviour tests, committed alone
+    /ship:spec-tests 164      opus: failing behaviour tests, committed alone
     /ship:ship-issue 164      worker: make them pass, add its own coverage
 /ship:land 167                orchestrator: CI, review, fix loop, re-review,
                               then merge or hand to a human, then clean up
@@ -41,7 +41,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
-| `spec-tests` | fable | delegate, ahead of the worker; a different model from the reviewer so the two judgement points do not share blind spots. `--test-model` overrides |
+| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). `--test-model fable` overrides for a large or risky issue |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 

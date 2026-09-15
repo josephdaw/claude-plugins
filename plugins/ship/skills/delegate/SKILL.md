@@ -10,9 +10,10 @@ never enter a worktree and never write code.
 
 Flags: `--model` forces the worker model for every issue. Without it,
 delegate picks per issue (step 2a) and says so. `--test-model` picks the
-model for the spec-test pass (step 3b), default opus. `--mode` picks the launch
-(default local). `--yes` skips the confirmation and treats a flagged issue
-as skipped rather than asking.
+model for the spec-test pass (step 3b), default opus, with `fable` available
+as an override for an issue the orchestrator judges large or risky.
+`--mode` picks the launch (default local). `--yes` skips the confirmation
+and treats a flagged issue as skipped rather than asking.
 
 ## 1. Read the Harness section
 
@@ -74,20 +75,22 @@ Launch the `ship:spec-tests` agent (Agent tool, `subagent_type:
 ship:spec-tests`) in the issue's worktree, with `model` from `--test-model`
 if given.
 
-On the model: the default is fable, with opus reviewing the PR (decided
-2026-09-10). The argument is not that one writes better tests. It is that
-the reviewer and the test writer are the two judgement points, and if they
-share a model they share blind spots: a behaviour neither considers passes
-the whole pipeline unchallenged and looks like agreement. Fable on tests
-and opus on review is the cheaper way round, since tests are written once
-per issue and the review runs once per round.
+On the model: the default is opus, with opus also reviewing the PR (decided
+2026-09-16, thrivity-ops#238). An experiment ran the same brief through
+spec-tests on fable, opus, and sonnet; two blind judges ranked opus first,
+fable second, sonnet well behind, and opus cost less per run than fable.
+The earlier default was fable, on the theory that the reviewer and the
+test writer are the two judgement points and sharing a model means sharing
+blind spots. That argument still matters, so it is not dropped, it is
+measured instead: over the next ten full-tier issues, count the
+`spec-tests missed:` NOTE items review-pr asks the reviewer to add, which
+land's report NOTE line and notes-scan pick up. Revisit the default on
+that count. `--test-model fable` stays available for an issue the
+orchestrator judges large or risky, and claude-plugins#11 (stress-spec on
+fable) remains the opt-in adversarial pass alongside it.
 
-That is a testable claim, so measure it: over the next ten full-tier
-issues, count how often the reviewer finds behaviour the tests missed,
-against the same count for opus tests. Keep or drop it on the number.
-It writes the failing tests that
-encode the issue's behaviour, proves they fail for the right reason, and
-commits them alone.
+spec-tests writes the failing tests that encode the issue's behaviour,
+proves they fail for the right reason, and commits them alone.
 
 Two of its outcomes are not "carry on":
 

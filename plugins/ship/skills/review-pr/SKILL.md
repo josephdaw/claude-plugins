@@ -74,6 +74,10 @@ reviews are wrong.
      them, confirm they fail for the absence of the behaviour rather than a
      missing import. This turns "would it fail if reverted" from a guess
      into evidence, so do not skip it because the tests are green now.
+   - When the PR has a spec-test commit and you raise a FIX for a
+     behaviour those tests did not cover, also add a NOTE starting
+     `spec-tests missed:` naming the behaviour, so land's NOTE line
+     carries the count delegate step 3b asks for.
 4. Rules. The repo's stated ones, plus the Structure rules in the coding
    rules file: dependency direction, file size, where authorisation
    lives, no logging of personal data, config in the database, and
