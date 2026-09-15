@@ -82,14 +82,12 @@ fable second, sonnet well behind, and opus cost less per run than fable.
 The earlier default was fable, on the theory that the reviewer and the
 test writer are the two judgement points and sharing a model means sharing
 blind spots. That argument still matters, so it is not dropped, it is
-measured instead: over the next ten full-tier issues, count how often the
-`ship:reviewer` pass finds behaviour the opus spec tests missed. Have the
-reviewer post that as a NOTE item on the PR when it happens, so it shows
-up in `land`'s report NOTE line and `notes-scan` picks it up in its weekly
-read. Revisit the default on that count. `--test-model fable` stays
-available for an issue the orchestrator judges large or risky, and
-claude-plugins#11 (stress-spec on fable) remains the opt-in adversarial
-pass alongside it.
+measured instead: over the next ten full-tier issues, count the
+`spec-tests missed:` NOTE items review-pr asks the reviewer to add, which
+land's report NOTE line and notes-scan pick up. Revisit the default on
+that count. `--test-model fable` stays available for an issue the
+orchestrator judges large or risky, and claude-plugins#11 (stress-spec on
+fable) remains the opt-in adversarial pass alongside it.
 
 spec-tests writes the failing tests that encode the issue's behaviour,
 proves they fail for the right reason, and commits them alone.

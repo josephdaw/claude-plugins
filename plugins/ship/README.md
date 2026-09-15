@@ -41,7 +41,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
-| `spec-tests` | opus | delegate, ahead of the worker; on measured test quality against the opus reviewer (2026-09-16). `--test-model fable` overrides for a large or risky issue |
+| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). `--test-model fable` overrides for a large or risky issue |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
