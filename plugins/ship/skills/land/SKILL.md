@@ -52,7 +52,35 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    `--review` overrides. Either way the result is a VERDICT line.
 
 4. Fix round, when the verdict is CHANGES or CI is red, while rounds
-   remain:
+   remain. First sort the FIX items:
+
+   - Code finding: one that changes a file the runtime, the tests, or the
+     ci gate reads.
+   - Text finding: the PR description, or a comment or docstring, where
+     the reviewer's own finding states the correct wording and the fix
+     needs no code change. A text finding whose correct wording the
+     reviewer did not give is not a text finding: treat it as code.
+
+   When every FIX in the verdict is a text finding, land applies the
+   wording itself instead of spending a round:
+   - A PR description finding: `gh pr edit <n> --body <the reviewer's
+     wording>`.
+   - A comment or docstring finding: edit the file to the reviewer's
+     wording, run the ci gate, then commit with a one-line message
+     naming the finding (for example `docs: correct the PR-9 fix
+     round comment per review`) and push.
+   - Ask for a re-review scoped to only what changed: the description, or
+     the one commit, not the whole diff again. This pass does not count
+     toward the round cap.
+   - This is the only case where land edits the PR itself. It never picks
+     the wording; it only applies the wording the reviewer already gave.
+     Land is not the author here, so it still cannot be the approver: the
+     re-review is mandatory (see below) and step 5 still checks the head
+     and the description against what was actually approved before any
+     merge.
+
+   Any other FIX (a code finding, or a text finding mixed with a code
+   finding) goes to a worker as before:
    - If the worker that opened the PR is still reachable (a subagent from
      this session), `SendMessage` it: "Review posted on PR <n>. Address
      every FIX, rerun the ci gate, push, and report."
@@ -64,10 +92,12 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    - Rounds exhausted with CHANGES still standing: stop, report the last
      review, and leave the PR open. Do not merge.
 
-   The re-review is not optional and it is not a skim. A fix round changes
-   the code that merges, so the previous verdict describes a commit that no
-   longer exists. Review the new head as its own diff, including any commit
-   the orchestrator wrote itself. Reviewing your own fix is not a review.
+   The re-review is not optional and it is not a skim, on either path. A
+   fix changes what merges, whether a worker wrote it or land applied the
+   reviewer's own wording, so the previous verdict describes a commit or a
+   description that no longer exists. Review the new head, or the edited
+   description, as its own diff, including any commit the orchestrator
+   wrote itself. Reviewing your own fix is not a review.
 
 5. Land, when the verdict is APPROVE and CI is green:
 
