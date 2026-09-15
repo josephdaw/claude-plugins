@@ -83,9 +83,9 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      spend a fix round: the worker is applying wording land and the
      reviewer already settled, not designing a fix.
    - Either way, land never picks the wording; it only applies, or has
-     applied, the wording the reviewer already gave. Land is not the
-     author here, so it still cannot be the approver: the re-review below
-     is mandatory, and step 5 still checks the head and the description
+     applied, the wording the reviewer already gave. Land still made the
+     change, so it cannot approve it: the fork re-review below is
+     mandatory, and step 5 still checks the head and the description
      against what was actually approved before any merge.
    - Go back to step 1 (CI on the pushed commit, when there was one).
      Then run the re-review as `fork` always, never `self`, regardless of
