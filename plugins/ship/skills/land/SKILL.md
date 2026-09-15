@@ -2,7 +2,7 @@
 name: land
 description: Take an open PR to merged (or to a human's queue): wait for CI, run the reviewer, route fixes back to a worker, then merge or hand over under the repo's merge policy, and clean up the worktree. Use after a worker reports a PR.
 argument-hint: <pr-number> [pr-number ...] [--rounds N] [--review self|fork]
-allowed-tools: Bash(gh:*), Bash(git:*), Agent, SendMessage, Read, Grep, Glob
+allowed-tools: Bash(gh:*), Bash(git:*), Agent, SendMessage, Read, Write, Grep, Glob
 ---
 
 Land each PR in `$ARGUMENTS`. Run independent PRs in parallel. `--rounds`
@@ -64,34 +64,43 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    When every FIX in the verdict is a text finding, land applies the
    wording itself instead of spending a round:
    - A PR description finding: read the current body with
-     `gh pr view <n> --json body -q .body` into a file, replace only the
-     sentence the finding names with the reviewer's wording, then
-     `gh pr edit <n> --body-file <that file>`. Never pass a whole new
-     body: `--body` replaces the description outright, and the
-     reviewer's wording is for the named sentence, not the rest of it.
-   - A comment or docstring finding: land's own allowed-tools have no
-     `Edit` and no way to run an arbitrary repo's ci gate, so it does not
-     touch the file itself. Instead it sends the reviewer's exact wording
-     to a worker (the one that opened the PR if reachable, else a fresh
-     `ship:worker` in the existing worktree, never a new one) with: "Make
-     only this edit: <the finding and the reviewer's wording>. Run the ci
-     gate, commit with a one-line message naming the finding, and push.
-     Do not touch anything else." This does not spend a fix round: the
-     worker is applying wording land and the reviewer already settled,
-     not designing a fix.
+     `gh pr view <n> --json body -q .body`, `Write` it to a scratch file,
+     replace only the sentence the finding names with the reviewer's
+     wording, then `gh pr edit <n> --body-file <that scratch file>`.
+     Never pass a whole new body: `--body` replaces the description
+     outright, and the reviewer's wording is for the named sentence, not
+     the rest of it. This scratch file is the only thing land writes; it
+     is not a file in the repo the PR touches.
+   - A comment or docstring finding: that file lives in the repo, and
+     land's own allowed-tools have no `Edit` and no way to run an
+     arbitrary repo's ci gate, so land does not touch a repo file itself.
+     Instead it sends the reviewer's exact wording to a worker (the one
+     that opened the PR if reachable, else a fresh `ship:worker` in the
+     existing worktree at the PR's branch and path, never a new one)
+     with: "Make only this edit: <the finding and the reviewer's
+     wording>. Run the ci gate, commit with a one-line message naming
+     the finding, and push. Do not touch anything else." This does not
+     spend a fix round: the worker is applying wording land and the
+     reviewer already settled, not designing a fix.
    - Either way, land never picks the wording; it only applies, or has
      applied, the wording the reviewer already gave. Land is not the
      author here, so it still cannot be the approver: the re-review below
      is mandatory, and step 5 still checks the head and the description
      against what was actually approved before any merge.
    - Go back to step 1 (CI on the pushed commit, when there was one).
-     Then run the re-review the way step 3 chose, telling the reviewer:
-     "Re-review PR <n>. Since your CHANGES review, only <the description
-     edit | commit <sha>> changed. Walk the whole description again."
-   - A text pass does not count toward the round cap. But it is a pass,
-     not a free loop: after two text passes in a row still come back
-     CHANGES, stop, report the last review, and leave the PR open, the
-     same as running out of rounds.
+     Then run the re-review as `fork` always, never `self`, regardless of
+     what step 3 chose for the earlier review: land wrote or dispatched
+     this edit, so it cannot also be the one who approves it. Launch the
+     `ship:reviewer` agent with "Re-review PR <n>. Since your CHANGES
+     review, only <the description edit | commit <sha>> changed. Walk
+     the whole description again."
+   - Track text passes and worker rounds as two separate tallies. A text
+     pass never counts toward the round cap. Two text passes in a row
+     still coming back CHANGES stops the PR on that verdict, the same as
+     running out of rounds, but it does not spend or block a worker
+     round: if a later CHANGES verdict on this same PR has a code
+     finding, it still goes to a worker while rounds remain, unaffected
+     by how many text passes came before it.
 
    Any other FIX (a code finding, or a text finding mixed with a code
    finding) goes to a worker while rounds remain:
