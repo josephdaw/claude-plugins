@@ -29,9 +29,8 @@ Read the Size line from the latest readiness comment on the issue
 (`ready-issue` SKILL.md step 3 puts it there: `small`, `medium`, or
 `large`). Delegate does not size the issue itself. When the latest
 readiness comment has no Size line, for example one posted before this
-was added, show `unknown` in the Size column and flag the row, so the
-batched question in step 2 offers re-running `/ship:ready-issue` or
-briefing anyway.
+was added, show `unknown` in the Size column and flag the row for the
+batched question in step 2a (brief anyway, research only, skip).
 
 Per issue, unless `--model` was given:
 
