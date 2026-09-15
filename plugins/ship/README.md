@@ -32,7 +32,7 @@ Each piece also stands alone:
 | `brief` | orchestrator | Turn an issue into a worker brief, with a prose-only readiness backstop |
 | `ship-issue` | worker | Brief to open PR: worktree, tests, code, docs, commit, push |
 | `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings as FIX, DEFER (issue created), or NOTE, return a verdict |
-| `land` | orchestrator | Wait for CI, run review-pr, route every FIX back to the worker, merge or hand over, clean up |
+| `land` | orchestrator | Wait for CI, run review-pr, apply a text-only FIX's given wording itself or route FIX back to the worker, re-review, merge or hand over, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
 | `notes-scan` | Talos weekly, a routine, or anyone | Read the NOTE lines on the week's merged PRs, turn a trend into a written rule, at most one tidy-up PR |
 | `adopt` | anyone | Set a repo up: settings.json, squash merge defaults, and the `## Harness` section |

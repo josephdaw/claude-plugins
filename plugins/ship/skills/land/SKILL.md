@@ -51,36 +51,50 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    new route or external call. Say which you chose and why in the report.
    `--review` overrides. Either way the result is a VERDICT line.
 
-4. Fix round, when the verdict is CHANGES or CI is red, while rounds
-   remain. First sort the FIX items:
+4. Fix round, when the verdict is CHANGES or CI is red. First sort the
+   FIX items:
 
-   - Code finding: one that changes a file the runtime, the tests, or the
-     ci gate reads.
    - Text finding: the PR description, or a comment or docstring, where
      the reviewer's own finding states the correct wording and the fix
-     needs no code change. A text finding whose correct wording the
-     reviewer did not give is not a text finding: treat it as code.
+     needs no other code change. A text finding whose correct wording
+     the reviewer did not give is not a text finding: treat it as code.
+   - Code finding: any FIX that is not a text finding, including a red
+     CI.
 
    When every FIX in the verdict is a text finding, land applies the
    wording itself instead of spending a round:
-   - A PR description finding: `gh pr edit <n> --body <the reviewer's
-     wording>`.
-   - A comment or docstring finding: edit the file to the reviewer's
-     wording, run the ci gate, then commit with a one-line message
-     naming the finding (for example `docs: correct the PR-9 fix
-     round comment per review`) and push.
-   - Ask for a re-review scoped to only what changed: the description, or
-     the one commit, not the whole diff again. This pass does not count
-     toward the round cap.
-   - This is the only case where land edits the PR itself. It never picks
-     the wording; it only applies the wording the reviewer already gave.
-     Land is not the author here, so it still cannot be the approver: the
-     re-review is mandatory (see below) and step 5 still checks the head
-     and the description against what was actually approved before any
-     merge.
+   - A PR description finding: read the current body with
+     `gh pr view <n> --json body -q .body` into a file, replace only the
+     sentence the finding names with the reviewer's wording, then
+     `gh pr edit <n> --body-file <that file>`. Never pass a whole new
+     body: `--body` replaces the description outright, and the
+     reviewer's wording is for the named sentence, not the rest of it.
+   - A comment or docstring finding: land's own allowed-tools have no
+     `Edit` and no way to run an arbitrary repo's ci gate, so it does not
+     touch the file itself. Instead it sends the reviewer's exact wording
+     to a worker (the one that opened the PR if reachable, else a fresh
+     `ship:worker` in the existing worktree, never a new one) with: "Make
+     only this edit: <the finding and the reviewer's wording>. Run the ci
+     gate, commit with a one-line message naming the finding, and push.
+     Do not touch anything else." This does not spend a fix round: the
+     worker is applying wording land and the reviewer already settled,
+     not designing a fix.
+   - Either way, land never picks the wording; it only applies, or has
+     applied, the wording the reviewer already gave. Land is not the
+     author here, so it still cannot be the approver: the re-review below
+     is mandatory, and step 5 still checks the head and the description
+     against what was actually approved before any merge.
+   - Go back to step 1 (CI on the pushed commit, when there was one).
+     Then run the re-review the way step 3 chose, telling the reviewer:
+     "Re-review PR <n>. Since your CHANGES review, only <the description
+     edit | commit <sha>> changed. Walk the whole description again."
+   - A text pass does not count toward the round cap. But it is a pass,
+     not a free loop: after two text passes in a row still come back
+     CHANGES, stop, report the last review, and leave the PR open, the
+     same as running out of rounds.
 
    Any other FIX (a code finding, or a text finding mixed with a code
-   finding) goes to a worker as before:
+   finding) goes to a worker while rounds remain:
    - If the worker that opened the PR is still reachable (a subagent from
      this session), `SendMessage` it: "Review posted on PR <n>. Address
      every FIX, rerun the ci gate, push, and report."
@@ -154,7 +168,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
 One block per PR:
 
 ```
-PR <n>: merged | awaiting human | blocked after <k> rounds
+PR <n>: merged | awaiting human | blocked after <k> rounds and <t> text passes
 Issue: #N closed | still open (why)
 Review: APPROVE | CHANGES, <FIX count> FIX, <DEFER issue numbers>, by self | fork (why)
 Worktree: removed | kept at <path>
