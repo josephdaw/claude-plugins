@@ -25,6 +25,13 @@ Run `/ship:brief` for each. Collect the flags.
 
 ### 2a. Pick the worker model
 
+Read the Size line from the latest readiness comment on the issue
+(`ready-issue` SKILL.md step 3 puts it there: `small`, `medium`, or
+`large`). Delegate does not size the issue itself. When the latest
+readiness comment has no Size line, for example one posted before this
+was added, show `unknown` in the Size column and flag the row for the
+batched question in step 2a (brief anyway, research only, skip).
+
 Per issue, unless `--model` was given:
 
 - `haiku` when the issue is labelled `docs`, `chore`, or `mechanical`, or
@@ -36,12 +43,14 @@ Per issue, unless `--model` was given:
 The reviewer is the check on the worker, so this is a cost dial. When in
 doubt, sonnet. Show the pick in the Model column of the table and explain
 any haiku pick in one clause, so a wrong rule gets corrected rather than
-overridden each time.
+overridden each time. The Size line is a separate fact about the issue's
+shape, not the model pick; show it next to Model so both are visible
+together.
 
 Then show one table:
 
 ```
-| Issue | Title | Branch | Model | Flags |
+| Issue | Title | Branch | Size | Model | Flags |
 ```
 
 Ask once, batched, how to handle flagged rows (brief anyway, research only,
