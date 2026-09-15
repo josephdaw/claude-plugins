@@ -132,6 +132,12 @@ PR.
   wrong against: an acceptance line, a rule the repo has written down, a
   correctness trace, or a test gap. A FIX that cannot name one is a NOTE.
   Any FIX means the verdict is CHANGES and the fix round clears it.
+  When the FIX is against the PR description, or against a comment or a
+  docstring, and no code change is needed, give the correct wording in
+  the finding itself, not just what is wrong. `/ship:land` applies a FIX
+  in that shape itself, without spending a worker round, but only when it
+  has the wording to apply; leaving it out sends the finding to a worker
+  as an ordinary fix round.
 - DEFER. Real, but out of scope for this issue or in need of a decision
   the issue did not make. You create the issue before you post the review:
   `gh issue create` with a title, a body written from the finding, and a
