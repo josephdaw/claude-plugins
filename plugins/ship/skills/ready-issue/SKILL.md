@@ -51,7 +51,7 @@ Every one of these is a command, not a judgement. Run them.
   will grow a flagged file, the split is raised first as its own issue,
   and this issue waits on it.
 
-## 3. Check it is one deliverable
+## 3. Check it is one deliverable, and size it
 
 - One PR's worth. If it needs two, say where it splits and why.
 - It does not depend on unlanded work, or it names that work and says it
@@ -59,6 +59,23 @@ Every one of these is a command, not a judgement. Run them.
 - It does not contradict a decision in the repo's decisions log or ADRs.
   If it does, that is a reversal and needs to be argued, not slipped in.
 - Nothing here is already done. Check the current code before assuming.
+- Size the issue, using the files and modules it names and the code you
+  checked in step 2:
+  - `small`: one or two files, one behaviour, no new module.
+  - `medium`: several files inside one module or owner, or one new
+    module.
+  - `large`: more than one module or owner, a new module plus changes to
+    its callers, or anything that needs a design choice made first.
+- A `large` issue is NOT READY, regardless of how the other checks in
+  this skill come out, and does not get the ready label. Name the seams
+  it splits on (design vs implementation, different test surfaces, an
+  unblocker the rest depends on) and propose the split in the readiness
+  comment as a numbered list of issues, each one `small` or `medium`, in
+  landing order. The author decides on the split and raises the new
+  issues; this skill does not create them.
+- The size is a fact about the issue's shape, not a model pick. Delegate
+  step 2a reads it when it chooses the worker model; it does not decide
+  it here.
 
 ## 4. Check it can be acted on
 
@@ -80,10 +97,15 @@ Readiness review
 
 Verdict: READY | NOT READY
 
+Size: small | medium | large
+
 Checked against the code: <what you actually ran or read, one line>
 
 Blocking:
 1. <what is wrong, the evidence, and what the issue should say instead>
+   For a `large` verdict, this is the proposed split: a numbered list of
+   issues, each one `small` or `medium`, in landing order, with the seam
+   each one sits on.
 
 Worth fixing:
 1. ...
