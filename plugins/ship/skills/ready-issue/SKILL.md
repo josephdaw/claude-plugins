@@ -74,8 +74,8 @@ Every one of these is a command, not a judgement. Run them.
   landing order. The author decides on the split and raises the new
   issues; this skill does not create them.
 - The size is a fact about the issue's shape, not a model pick. Delegate
-  step 2a reads it when it chooses the worker model; it does not decide
-  it here.
+  step 2a reads it when it chooses the worker model; ready-issue does not
+  pick the model.
 
 ## 4. Check it can be acted on
 
@@ -103,7 +103,7 @@ Checked against the code: <what you actually ran or read, one line>
 
 Blocking:
 1. <what is wrong, the evidence, and what the issue should say instead>
-   For a `large` verdict, this is the proposed split: a numbered list of
+   When Size is large, this is the proposed split: a numbered list of
    issues, each one `small` or `medium`, in landing order, with the seam
    each one sits on.
 
