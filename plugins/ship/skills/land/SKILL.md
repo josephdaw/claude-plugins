@@ -174,17 +174,48 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
 
 ## Report
 
-One block per PR:
+The reader is the person who merges, not the orchestrator. They have
+already paid for the full evidence: it is on the PR in the reviewer's
+comments and in the session transcript. Do not repeat it. The report is a
+digest of what they need to know and what they need to decide, one block
+per PR, in this order and this shape:
 
 ```
-PR <n>: merged | awaiting human | blocked after <k> rounds and <t> text passes
-Issue: #N closed | still open (why)
-Review: APPROVE | CHANGES, <FIX count> FIX, <DEFER issue numbers>, by self | fork (why)
-Worktree: removed | kept at <path>
+PR #<n> (#<issue>): READY TO MERGE | MERGED | BLOCKED. CI <green|red>, <approved on <sha> | CHANGES after <k> rounds and <t> text passes>.
+
+Decisions I made for you (redirect on the issue if wrong):
+- <one line per decision the orchestrator made without the human, or "none">
+
+Needs you:
+- <one line per action or unmade choice; a choice lists its options in one line each, or "nothing">
+
+Not proven: <one line per thing no test or run verified, with the follow-up issue number, or "nothing">
+Deferred: <#issue (priority, one clause on why it waits)>, or "nothing"
+Rounds: <k> worker, <t> text. Worktree <removed | kept at <path>>. Full detail on the PR.
 ```
 
-Then one line listing the reviewer's NOTE items, so the weekly scan can
-find them, and confirming every DEFER has an issue number.
+Rules for the digest:
+
+- Five sections, always in that order, every section present even when
+  its value is "none" or "nothing", so a missing section reads as an
+  omission rather than an all-clear.
+- One line per item, about twenty words. No evidence, no counts, no test
+  names, no file paths unless the reader must open that file. A count
+  belongs in the digest only when it changes what the reader does.
+- A decision the orchestrator made in the human's place always appears
+  under "Decisions I made for you", including one recorded on the issue
+  during the spec-test pass or a fix round. The human cannot redirect a
+  decision they were not told about.
+- Every unmade choice goes under "Needs you" with its options, one line
+  each, and the orchestrator's pick marked. A choice buried in prose is a
+  choice the reader misses.
+- "Not proven" carries what the reviewer's "Not verified" line carries,
+  reduced to one line each, plus the follow-up issue that will close it.
+  A gap with no issue number is not reported as closed; raise the issue
+  first.
+- Every DEFER has an issue number. The reviewer's NOTE items are not
+  repeated here: notes-scan reads them from the PR comments.
+- No headers, no tables, no bold beyond the section labels.
 
 A PR opened outside this skill (a Talos salvage, a hand-written PR) gets
 this skill run on it before anyone is asked to merge. A merge with a FIX

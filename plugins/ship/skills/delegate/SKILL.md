@@ -84,7 +84,7 @@ test writer are the two judgement points and sharing a model means sharing
 blind spots. That argument still matters, so it is not dropped, it is
 measured instead: over the next ten full-tier issues, count the
 `spec-tests missed:` NOTE items review-pr asks the reviewer to add, which
-land's report NOTE line and notes-scan pick up. Revisit the default on
+notes-scan reads from the PR comments. Revisit the default on
 that count. `--test-model fable` stays available for an issue the
 orchestrator judges large or risky, and claude-plugins#11 (stress-spec on
 fable) remains the opt-in adversarial pass alongside it.
