@@ -67,6 +67,7 @@ guess when it is missing. `/ship:adopt` writes it.
 | ci gate | pnpm lint && pnpm typecheck && pnpm test && pnpm build |
 | worktree | scripts/new-worktree.sh <branch> |
 | default branch | main |
+| risk areas | order placement, fills, P&L, auth |
 ```
 
 merge policy is `auto` (the orchestrator merges after CI passes and the
@@ -77,6 +78,12 @@ ci gate is the one command a worker must pass before pushing.
 
 worktree is optional. Without it, delegate uses `git worktree add` beside
 the checkout.
+
+risk areas is optional: the parts of the code where a mistake costs money
+or exposes data. ready-issue sizes by it. A risk-area issue carries one
+behaviour change and nothing else, while a mechanical change elsewhere is
+never `large` for breadth alone. Without the row, ready-issue treats
+money, stored financial or personal records, and auth as risk areas.
 
 ## Setting a repo up
 

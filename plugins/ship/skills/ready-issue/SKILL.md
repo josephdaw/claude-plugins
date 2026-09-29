@@ -59,13 +59,31 @@ Every one of these is a command, not a judgement. Run them.
 - It does not contradict a decision in the repo's decisions log or ADRs.
   If it does, that is a reversal and needs to be argued, not slipped in.
 - Nothing here is already done. Check the current code before assuming.
-- Size the issue, using the files and modules it names and the code you
-  checked in step 2:
-  - `small`: one or two files, one behaviour, no new module.
+- Decide whether it touches a risk area. The repo's Harness section may
+  list `risk areas`. The issue touches one when it changes behaviour in
+  code that owns one of them. With no list, a risk area is anything that
+  can move money, change stored financial or personal records, or change
+  authentication or authorisation.
+- Decide whether it is mechanical: it changes no behaviour (a move, a
+  rename, a split behind a facade, deleting dead code, docs, config, or
+  test hygiene), and the existing tests pass with nothing changed but
+  import paths.
+- Size the issue by what a reviewer has to check, using the files and
+  modules it names and the code you checked in step 2:
+  - `small`: one behaviour in one or two files, no new module. Or a
+    mechanical change a reviewer can check by pattern in one sitting,
+    however many files it touches.
   - `medium`: several files inside one module or owner, or one new
-    module.
-  - `large`: more than one module or owner, a new module plus changes to
-    its callers, or anything that needs a design choice made first.
+    module. Or a mechanical change too big to check by pattern in one
+    sitting.
+  - `large`: behaviour changes across more than one module or owner, a
+    new module plus changes to its callers, or anything that needs a
+    design choice made first.
+- A mechanical change is never `large` because of breadth alone.
+- A risk-area issue carries one behaviour change and nothing else: no
+  bundled refactor, no second fix, no tidy-up. If it bundles other work it
+  is NOT READY. Propose moving the extra work to its own issue. This holds
+  even when a scope decision (below) is recorded.
 - A `large` issue is NOT READY, regardless of how the other checks in
   this skill come out, and does not get the ready label. Name the seams
   it splits on (design vs implementation, different test surfaces, an
@@ -73,6 +91,13 @@ Every one of these is a command, not a judgement. Run them.
   comment as a numbered list of issues, each one `small` or `medium`, in
   landing order. The author decides on the split and raises the new
   issues; this skill does not create them.
+- A recorded scope decision holds. When the body, or a comment by the
+  author, has a line starting `Scope:` that records a decision to ship the
+  issue as one PR (who decided, when, and why), do not propose a split for
+  breadth or bundling. Still report the size, but `large` alone does not
+  make it NOT READY. Only a new hard fact reopens the decision: a file the
+  change would take over the size cap (step 2), risk-area behaviour
+  bundled with other work, or a design choice not yet made. Name the fact.
 - The size is a fact about the issue's shape, not a model pick. Delegate
   step 2a reads it when it chooses the worker model; ready-issue does not
   pick the model.
@@ -99,13 +124,17 @@ Verdict: READY | NOT READY
 
 Size: small | medium | large
 
+Risk area: none | <which area, from the Harness list or the default>
+
+Scope decision: none | honoured | reopened: <the new fact>
+
 Checked against the code: <what you actually ran or read, one line>
 
 Blocking:
 1. <what is wrong, the evidence, and what the issue should say instead>
-   When Size is large, this is the proposed split: a numbered list of
-   issues, each one `small` or `medium`, in landing order, with the seam
-   each one sits on.
+   When Size is large and no scope decision holds, this is the proposed
+   split: a numbered list of issues, each one `small` or `medium`, in
+   landing order, with the seam each one sits on.
 
 Worth fixing:
 1. ...

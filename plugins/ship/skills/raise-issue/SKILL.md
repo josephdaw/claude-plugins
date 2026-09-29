@@ -34,6 +34,9 @@ Only the first five are always required.
    codebase does not contain and no agent can derive.
 7. Out of scope, when the issue sits next to work it must not absorb.
 8. Related issues and PRs, including anything it must land after.
+9. A `Scope:` line, when the author has decided it ships as one PR even
+   though it is broad. Say who decided, when, and why. ready-issue step 3
+   owns what the line does.
 
 ## What the issue must NOT carry
 
