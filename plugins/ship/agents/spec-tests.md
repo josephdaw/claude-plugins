@@ -1,6 +1,6 @@
 ---
 name: spec-tests
-description: Writes the failing tests that encode one issue's behaviour, before any implementation exists. Runs them to prove they fail for the right reason, commits them alone, and reports the case list. Launched by /ship:delegate ahead of the worker. Opus by default, chosen on a 2026-09-16 comparison with fable and sonnet (thrivity-ops#238); `--test-model fable` is available as an override (see delegate's Flags).
+description: Writes the failing tests that encode one issue's behaviour, before any implementation exists. Runs them to prove they fail for the right reason, commits them alone, and reports the case list. Launched by /ship:delegate ahead of the worker. Opus by default, chosen on a 2026-09-16 comparison with fable and sonnet (thrivity-ops#238); delegate picks fable instead for a large or risk-area issue (delegate step 2a).
 model: opus
 ---
 

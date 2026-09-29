@@ -9,10 +9,11 @@ Delegate each issue in `$ARGUMENTS` to its own worker. You coordinate. You
 never enter a worktree and never write code.
 
 Flags: `--model` forces the worker model for every issue. Without it,
-delegate picks per issue (step 2a) and says so. `--test-model` picks the
-model for the spec-test pass (step 3b), default opus, with `fable` available
-as an override. Decide it on the Size and Risk area columns in step 2a's
-table, not on a reading of the title.
+delegate picks per issue (step 2a) and says so. `--test-model` forces the
+spec-test model (step 3b) for every issue. Without it, delegate picks per
+issue in step 2a: `fable` when the Size is `large` or the Risk area is
+neither `none` nor `unknown`, else `opus`, and shows it in the Test model
+column.
 `--mode` picks the launch (default local). `--yes` skips the confirmation
 and treats a flagged issue as skipped rather than asking.
 
@@ -36,12 +37,13 @@ batched question in step 2a (brief anyway, research only, skip).
 
 Read the Risk area line from the same comment (ready-issue step 3 puts it
 there). Show it in the Risk area column, `unknown` when absent. An
-unknown Risk area does not flag the row.
+unknown Risk area does not flag the row, but it rules out haiku, the same
+as a named one.
 
 Per issue, unless `--model` was given:
 
 - `haiku` when all three hold:
-  - the Risk area is `none` or `unknown`;
+  - the Risk area is `none`;
   - the issue is labelled `docs`, `chore`, or `mechanical`, or its scope
     is a rename, a copy change, a config value, a dependency bump, or
     moving code without changing it;
@@ -58,7 +60,7 @@ together.
 Then show one table:
 
 ```
-| Issue | Title | Branch | Size | Risk area | Model | Flags |
+| Issue | Title | Branch | Size | Risk area | Model | Test model | Flags |
 ```
 
 Ask once, batched, how to handle flagged rows (brief anyway, research only,
@@ -79,8 +81,8 @@ Docs-only and runtime-free `chore` issues skip this. Everything else gets a
 spec-test pass before any implementation.
 
 Launch the `ship:spec-tests` agent (Agent tool, `subagent_type:
-ship:spec-tests`) in the issue's worktree, with `model` from `--test-model`
-if given.
+ship:spec-tests`) in the issue's worktree, with the model from the Test
+model column.
 
 On the model: the default is opus, with opus also reviewing the PR (decided
 2026-09-16, thrivity-ops#238). An experiment ran the same brief through
@@ -89,10 +91,11 @@ fable second, sonnet well behind, and opus cost less per run than fable.
 The earlier default was fable, on the theory that the reviewer and the
 test writer are the two judgement points and sharing a model means sharing
 blind spots. That argument still matters, so it is not dropped, it is
-measured instead: over the next ten full-tier issues, count the
+measured instead: over the next ten full-tier issues that run on opus
+(fable rows do not count), count the
 `spec-tests missed:` NOTE items review-pr asks the reviewer to add, which
 notes-scan reads from the PR comments. Revisit the default on
-that count. `--test-model fable` stays available (see Flags), and
+that count. Large and risk-area issues get fable (see Flags), and
 claude-plugins#11 (stress-spec on
 fable) remains the opt-in adversarial pass alongside it.
 

@@ -41,7 +41,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
-| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). `--test-model fable` overrides, decided on the issue's Size and Risk area |
+| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). fable instead for a large or risk-area issue (delegate step 2a) |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
@@ -80,8 +80,9 @@ worktree is optional. Without it, delegate uses `git worktree add` beside
 the checkout.
 
 risk areas is optional: the parts of the code where ready-issue holds an
-issue to one behaviour change. ready-issue step 3 owns what the row does
-and the default it uses when the row is absent.
+issue to one behaviour change, land always runs the fork review, and
+delegate never picks haiku. ready-issue step 3 owns the definition and
+the default it uses when the row is absent.
 
 ## Setting a repo up
 
@@ -113,8 +114,9 @@ must be committed on the branch the session cloned.
 ## Which model does what
 
 Workers: delegate picks per issue. Haiku for a mechanical change (rename,
-copy, config, dependency bump, a `docs` or `chore` label), sonnet for
-anything with behaviour to prove. `--model` forces it. The pick is printed
+copy, config, dependency bump, a `docs` or `chore` label) whose readiness
+comment says `Risk area: none`, sonnet for anything else. `--model`
+forces it. The pick is printed
 so a wrong rule gets fixed here rather than overridden each time.
 
 Review: `review-pr` is one checklist. land runs it in one of two places.
