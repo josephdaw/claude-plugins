@@ -6,8 +6,9 @@ allowed-tools: Bash(gh:*), Bash(git:*), Agent, SendMessage, Read, Write, Grep, G
 ---
 
 Land each PR in `$ARGUMENTS`. Run independent PRs in parallel. `--rounds`
-caps fix rounds; default 2. `--review` forces where the review runs; by
-default land decides per PR (step 3).
+caps fix rounds; default 2. `--review` forces where the review runs, except
+that `--review self` never applies to a risk area; by default land
+decides per PR (step 3).
 
 Read the repo's CLAUDE.md `## Harness` section first for merge policy,
 default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
@@ -29,7 +30,8 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
 3. Review. How deep depends on what the PR touches.
 
    Light: the PR changes only documentation, or is a `chore` that touches
-   no runtime code. Review inline, one pass.
+   no runtime code. Review inline, one pass, unless a risk area (below)
+   forces `fork`.
 
    Full: everything else, with no exceptions carved out for a small diff.
    Size is not risk. A one-line change to order placement outranks a
@@ -46,10 +48,22 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      context on opus, so it does not share the blind spots of the session
      that briefed the work.
    Default `fork`. Choose `self` only when all of these hold: under about
-   150 changed lines (`gh pr diff <n> --stat`), no file under an auth,
-   permission, proxy, schema, migration, payment, or payroll path, and no
-   new route or external call. Say which you chose and why in the report.
-   `--review` overrides. Either way the result is a VERDICT line.
+   150 changed lines (`gh pr diff <n> --stat`), no risk area (below), no
+   file under an auth, permission, proxy, schema, migration, payment, or
+   payroll path, and no new route or external call.
+   A risk area forces `fork`. The PR is in one when issue N's latest
+   readiness comment has a `Risk area:` line other than `none`, or when
+   the diff edits code that owns a risk area as
+   `<base>/../ready-issue/SKILL.md` step 3 defines it, whether or not the
+   edit changes behaviour. Read the diff whenever `self` is still possible
+   or `--review self` was given, even when the comment says `none`: a
+   worker's diff can reach further than its issue. With no linked issue,
+   no readiness comment, or no Risk area line, the diff read alone
+   decides. A diff you cannot place counts as touching one. The path list
+   above is a backstop for that read, not the definition of risk.
+   Say which you chose and why in the report. `--review fork` always
+   applies. `--review self` does not apply to a risk area: run `fork` and
+   say the override was refused. Either way the result is a VERDICT line.
 
 4. Fix round, when the verdict is CHANGES or CI is red. First sort the
    FIX items:
