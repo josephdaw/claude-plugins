@@ -41,7 +41,7 @@ Each piece also stands alone:
 
 | Agent | Model | Used by |
 |-------|-------|---------|
-| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). `--test-model fable` overrides for a large or risky issue |
+| `spec-tests` | opus | delegate, ahead of the worker; chosen over fable and sonnet on test quality (2026-09-16). `--test-model fable` overrides, decided on the issue's Size and Risk area |
 | `worker` | sonnet | delegate, land (fix rounds) |
 | `reviewer` | opus | land in `fork` mode; a fresh-context wrapper around `review-pr` |
 
@@ -120,8 +120,8 @@ so a wrong rule gets fixed here rather than overridden each time.
 Review: `review-pr` is one checklist. land runs it in one of two places.
 `fork` launches the `reviewer` agent on opus in a fresh context, the
 default. `self` runs it inline in the orchestrator, chosen only for a small
-diff that touches nothing risky, because an inline review shares the
-blind spots of the session that briefed the work. `--review` forces either.
+diff outside every risk area, because an inline review shares the blind
+spots of the session that briefed the work. land step 3 owns the rule.
 
 ## Conventions the skills assume
 

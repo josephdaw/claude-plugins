@@ -46,10 +46,19 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      context on opus, so it does not share the blind spots of the session
      that briefed the work.
    Default `fork`. Choose `self` only when all of these hold: under about
-   150 changed lines (`gh pr diff <n> --stat`), no file under an auth,
-   permission, proxy, schema, migration, payment, or payroll path, and no
-   new route or external call. Say which you chose and why in the report.
-   `--review` overrides. Either way the result is a VERDICT line.
+   150 changed lines (`gh pr diff <n> --stat`), no risk area (below), no
+   file under an auth, permission, proxy, schema, migration, payment, or
+   payroll path, and no new route or external call.
+   A risk area forces `fork`. The PR is in one when issue N's latest
+   readiness comment has a `Risk area:` line other than `none`, or when
+   the diff touches one under the definition in
+   `<base>/../ready-issue/SKILL.md` step 3. Always read the diff, even
+   when the comment says `none`: a worker's diff can reach further than
+   its issue. A diff you cannot place counts as touching one. The path
+   list above is a backstop for that read, not the definition of risk.
+   Say which you chose and why in the report. `--review fork` always
+   applies. `--review self` does not apply to a risk area: run `fork` and
+   say the override was refused. Either way the result is a VERDICT line.
 
 4. Fix round, when the verdict is CHANGES or CI is red. First sort the
    FIX items:
