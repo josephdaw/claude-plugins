@@ -108,10 +108,10 @@ add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
 - merge policy: from `--merge-policy`, else ask one question: is this repo
   in production or relied on by anyone? Yes means `human`, no means `auto`.
   Recommend `human` when unsure.
-- risk areas: from `--risk-areas`, else ask one question: which parts of
-  this repo can move money, change stored financial or personal records,
-  or change auth? Write the answer as a short comma list. None named means
-  no row, and ready-issue uses its default.
+- risk areas: from `--risk-areas`, else read the default risk-area
+  definition in `<base>/../ready-issue/SKILL.md` step 3 and ask one
+  question: which parts of this repo fit it? Write the answer as a short
+  comma list. None named means no row, and ready-issue uses its default.
 - structure check: whether the ci gate above runs anything that enforces
   the Structure rules in the plugin's coding rules file (file or function
   size, an import-direction lint rule, an ownership-map completeness

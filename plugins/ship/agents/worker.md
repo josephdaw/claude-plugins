@@ -39,7 +39,8 @@ Rules that override any habit:
   spec is wrong, not the implementation, and grinding on costs more than
   a human reading the issue.
 - Do not widen scope. If the issue is bigger than one PR, stop and report
-  the split you propose.
+  the split you propose, unless the brief carries a person's `Scope:` line
+  deciding it ships as one PR. Then build it as one PR.
 - If a spec has an unresolved choice, stop and report. Never pick.
 - Never claim a check passed that you did not run. Paste failing output.
 - Your job ends when the PR is open and the local gate is green. Do not
