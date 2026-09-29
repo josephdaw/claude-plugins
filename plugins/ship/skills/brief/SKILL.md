@@ -96,7 +96,8 @@ Dependencies are installed and .env is in place.
 
 ## Scope
 
-<the scope as written, structure preserved>
+<the scope as written, structure preserved. Keep any `Scope:` line
+verbatim; ready-issue step 3 owns what it means>
 
 ## Spec addenda (authoritative over Scope where they differ)
 

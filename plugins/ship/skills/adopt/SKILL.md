@@ -1,7 +1,7 @@
 ---
 name: adopt
 description: Set a repo up for the ship plugin: write the marketplace and plugin entries into .claude/settings.json, add a cloud SessionStart hook that installs the plugin, and add the Harness section to CLAUDE.md. Use when a repo has no Harness section, when ship skills are missing in a cloud session, or when delegate, brief, or land say to run it.
-argument-hint: [--merge-policy auto|human] [--no-cloud-hook]
+argument-hint: [--merge-policy auto|human] [--risk-areas "<list>"] [--no-cloud-hook]
 allowed-tools: Bash(git:*), Bash(gh:*), Bash(ls:*), Bash(cat:*), Bash(test:*), Bash(chmod:*), Read, Write, Edit, Grep, Glob, AskUserQuestion
 ---
 
@@ -108,6 +108,10 @@ add only that. Check `.gitignore` does not exclude `.claude/hooks/`.
 - merge policy: from `--merge-policy`, else ask one question: is this repo
   in production or relied on by anyone? Yes means `human`, no means `auto`.
   Recommend `human` when unsure.
+- risk areas: from `--risk-areas`, else read the default risk-area
+  definition in `<base>/../ready-issue/SKILL.md` step 3 and ask one
+  question: which parts of this repo fit it? Write the answer as a short
+  comma list. None named means no row, and ready-issue uses its default.
 - structure check: whether the ci gate above runs anything that enforces
   the Structure rules in the plugin's coding rules file (file or function
   size, an import-direction lint rule, an ownership-map completeness
@@ -131,12 +135,14 @@ not in the plugin.
 | ci gate | pnpm lint && pnpm typecheck && pnpm test && pnpm build |
 | worktree | scripts/new-worktree.sh <branch> |
 | default branch | main |
+| risk areas | order placement, fills, P&L, auth |
 
 merge policy auto: the orchestrator merges after CI passes and the
 reviewer approves. human: a person reviews and merges.
 ```
 
-Omit the worktree row when there is no script.
+Omit the worktree row when there is no script, and the risk areas row
+when none were named.
 
 ## 6. Report
 

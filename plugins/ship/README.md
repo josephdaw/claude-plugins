@@ -67,6 +67,7 @@ guess when it is missing. `/ship:adopt` writes it.
 | ci gate | pnpm lint && pnpm typecheck && pnpm test && pnpm build |
 | worktree | scripts/new-worktree.sh <branch> |
 | default branch | main |
+| risk areas | order placement, fills, P&L, auth |
 ```
 
 merge policy is `auto` (the orchestrator merges after CI passes and the
@@ -77,6 +78,10 @@ ci gate is the one command a worker must pass before pushing.
 
 worktree is optional. Without it, delegate uses `git worktree add` beside
 the checkout.
+
+risk areas is optional: the parts of the code where ready-issue holds an
+issue to one behaviour change. ready-issue step 3 owns what the row does
+and the default it uses when the row is absent.
 
 ## Setting a repo up
 
@@ -98,7 +103,7 @@ hand:
    needs: a Node version, a dependency install, a database for the tests.
    Skip with `--no-cloud-hook` if a repo does not want hooks.
 4. A `## Harness` section in CLAUDE.md with the merge policy, ci gate,
-   default branch, and optional worktree script.
+   default branch, and the optional worktree script and risk areas.
 5. Issues carry a `ready` label when specified, and a `talos` label to
    hand-pick them for an unattended night.
 
