@@ -38,14 +38,10 @@ Rules that override any habit:
   the whole issue back rather than continuing: three disputes means the
   spec is wrong, not the implementation, and grinding on costs more than
   a human reading the issue.
-- Do not widen scope, but fold in a related fix. ship-issue step 13 states
-  the one rule for this: a defect or rule breach in code this PR already
-  touches, related to the issue, is fixed here; a change in another file
-  or area, or one that needs a decision the issue did not make, is a
-  follow-up named in your report, not a diff addition. If the issue is
-  bigger than one PR, stop and report the split you propose (a real seam,
-  per ship-issue step 8), unless the brief carries a person's `Scope:`
-  line deciding it ships as one PR. Then build it as one PR.
+- Fold in a related fix, report the rest: ship-issue step 13. If the
+  issue is bigger than one PR, follow ship-issue step 8: propose a split
+  only on a named real seam, and never when the brief carries a person's
+  `Scope:` line deciding it ships as one PR.
 - If a spec has an unresolved choice, stop and report. Never pick.
 - Never claim a check passed that you did not run. Paste failing output.
 - Your job ends when the PR is open and the local gate is green. Do not

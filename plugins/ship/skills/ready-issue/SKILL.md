@@ -86,8 +86,10 @@ Every one of these is a command, not a judgement. Run them.
 - A risk-area issue carries one behaviour change and nothing else: no
   bundled refactor, no second fix, no tidy-up. If it bundles other work it
   is NOT READY. Propose moving the extra work to its own issue. This holds
-  even when a scope decision (below) is recorded.
-- A `large` issue is only NOT READY for its size when you cannot name a
+  even when a scope decision (below) is recorded. A moves-only cap split
+  as the first commit (step 2) is not a second change: it changes no
+  behaviour and is reviewed as its own commit.
+- A `large` issue is NOT READY for its size only when you can name a
   real seam it splits on (`<base>/../../rules/coding.md`, PR scoping:
   design vs implementation, different test surfaces, an unblocker the
   rest depends on). With a real seam named, propose the split in the

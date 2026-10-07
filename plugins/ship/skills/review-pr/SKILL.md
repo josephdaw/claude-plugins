@@ -52,8 +52,8 @@ wording itself and moves straight to merge.
 Prefer running something over reasoning about it. If a claim can be checked
 by executing it, execute it: read the installed dependency's source rather
 than recalling its semantics, run the schema against the input the spec
-names, reproduce the failing job locally. State which findings you verified
-by running and which you reasoned about, because the second kind is where
+names, reproduce the failing job locally. A claim you reasoned about but
+did not run goes on the Not verified list, because that kind is where
 reviews are wrong.
 
 ## 2. Judge, in this order

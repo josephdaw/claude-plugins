@@ -141,7 +141,7 @@ Do not split when the pieces are the same surface done in sequence. Absorbing ac
 
 Smells that a split is too granular: a PR that cannot be meaningfully tested without its siblings; PRs that must merge in a fixed order to make sense; a "delete the old thing" PR separated from the "build the replacement" PR; relabelling or copy split out from the change that introduced it; more than a couple of PRs all editing the same file.
 
-Smells that a PR is too big: defining new vocabulary and consuming it in unrelated places in the same change; doing an audit and all the fixes it uncovers in one change; stapling an unrelated "while we are here" cleanup onto something otherwise cohesive. This does not contradict "Fix related problems now" above: that rule is for a related fold-in in code the PR already touches, this smell is for an unrelated tidy-up that belongs in its own follow-up instead.
+Smells that a PR is too big: defining new vocabulary and consuming it in unrelated places in the same change; doing an audit and all the fixes it uncovers in one change; stapling an unrelated "while we are here" cleanup onto something otherwise cohesive. A related fix in code the PR already touches is not this smell: it is a fold-in ("Fix related problems now" above).
 
 Process:
 - Before agreeing on the work, lay out the proposed PRs as a numbered list, naming the seam each one sits on. Confirm the split before opening anything. If you cannot name the seam, it is one PR.

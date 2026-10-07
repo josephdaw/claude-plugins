@@ -34,8 +34,8 @@ footer `land` and `ship-issue` expect instead of its own emoji one:
 }
 ```
 
-Ask first, same question as the ASCII script copy below: this is Joe's
-default, and another user of this repo may not want it. Default yes.
+Ask first, same question as the ASCII script copy below: this is the
+plugin's default, and a team may not want it. Default yes.
 
 ## 1b. The ASCII check script
 

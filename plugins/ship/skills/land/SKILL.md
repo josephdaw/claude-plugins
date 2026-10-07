@@ -23,8 +23,8 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    with the PR's `createdAt`. If the issue changed after the PR was opened,
    or after the worker was briefed if you know that time, tell the reviewer
    in its prompt: "Issue N was edited after the brief. The live body is the
-   spec. Walk every What to build, Test plan, and Acceptance item and name
-   each one the PR misses." A missed item is a Must fix.
+   spec. Walk every behaviour and acceptance line and name each one the
+   PR misses." A missed item is a Must fix.
 
 3. Review. One round, full stop. A re-review only follows a worker fix
    round below, and reads only that fix diff. How deep the one round runs
@@ -111,22 +111,24 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    fix (land's own edit) is never re-reviewed by land, only ever applied
    from wording a reviewer already gave.
 
-5. Land, when the verdict is APPROVE and CI is green:
+5. Land, when the verdict is APPROVE and CI is green on the current head
+   (after a Lander-fix push, wait for CI on that push):
 
-   Before merging, check the commit you are about to merge is the one that
-   was reviewed:
+   Before merging, check nothing moved that neither a reviewer nor land
+   itself made. Head first:
 
    ```
    gh pr view <n> --json headRefOid -q .headRefOid
    ```
 
-   It must equal the head the APPROVE was given on. If it moved, for any
-   reason, go back to step 3. Never merge a commit no reviewer has seen.
+   It must equal the sha the approving `Review: ` line names, or that sha
+   plus only the Lander-fix commits land pushed in this run
+   (`git log <reviewed sha>..<head> --oneline` lists only those). Anything
+   else, go back to step 3. Never merge a commit no reviewer has seen.
 
-   Then check the description itself has not moved since the approving
-   review. The reviewer posts a plain PR comment (an IssueComment), not a
-   GitHub review (a PullRequestReview), so compare the PR's
-   `lastEditedAt` against that comment's `createdAt`:
+   Then the description. The reviewer posts a plain PR comment (an
+   IssueComment), not a GitHub review (a PullRequestReview), so compare
+   the PR's `lastEditedAt` against that comment's `createdAt`:
 
    ```
    gh api graphql -f query='
@@ -141,25 +143,24 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    ```
 
    Find the latest comment whose body starts with the `Review: ` first
-   line and read its `createdAt`. If the PR's `lastEditedAt` is later, the
-   approved text is not the text about to be merged: go back to step 3
-   and re-review the current description. The head check above must also
-   hold with only land's own Lander-fix commits on top of the reviewed
-   sha, and this body check must hold with only land's own Lander-fix
-   edits on top of the reviewed body; anything else that moved, a push or
-   a body edit land did not make, sends it back to step 3.
+   line and read its `createdAt`. If the PR's `lastEditedAt` is later,
+   the current body must be exactly the body land last wrote with
+   `gh pr edit` in this run. If land made no body edit, or the body
+   differs from what it wrote, someone else changed the approved text:
+   go back to step 3 and re-review the current description.
 
-   Before merging, run the ASCII check on the PR body:
-   `python3 <the repo's copy, usually .claude/ship/check-ascii.py>
-   --body-file <the body file just read>`. A hit is a Lander fix: fix it
-   yourself (the hit names the exact character and line), write the body
-   back, and check again. Loop until clean.
+   Then the ASCII check on the PR body, when the repo has a copy of the
+   script (`.claude/ship/check-ascii.py`; no copy, skip this check):
+   `python3 .claude/ship/check-ascii.py --body-file <the body file>`. A
+   hit is a Lander fix: replace the character the hit names, write the
+   body back, and check again until clean.
 
-   Follow-ups, from every review this PR collected (the main review plus
-   any re-review): collect every "Append to #N" and "Suggest: <title>"
-   line, plus any "Not verified" gap that later work must close (a
-   missing test, an environment nobody can reach yet). A gap that is only
-   a by-hand check the merger can do now goes in the digest, not here.
+   Follow-ups: collect every "Append to #N" and "Suggest: <title>" line
+   from every review this PR collected (the main review plus any
+   re-review), the Follow-up lines from the worker's report when you have
+   it, and any "Not verified" gap that later work must close (a missing
+   test, an environment nobody can reach yet). A gap that is only a
+   by-hand check the merger can do now goes in the digest, not here.
    - For each "Append to #N", `gh issue comment N` with that one line.
    - Search open issues for the rest
      (`gh issue list --state open --search "<keywords>"`) and append to

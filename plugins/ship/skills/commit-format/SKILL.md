@@ -100,12 +100,10 @@ Rules:
   no issue, Why holds the problem line alone and there is no Closes/Refs
   line.
 - Plain ASCII. The last line is the plain-text attribution line,
-  `Generated with Claude Code`, no emoji, no session link. The Claude Code
-  `attribution` project setting that `ship:adopt` writes produces this
-  automatically; where a user instruction about attribution exists, it
-  outranks Claude Code's own default footer.
-- No asterisk bullets: the template above uses none, so this holds by
-  construction.
+  `Generated with Claude Code`, with no emoji and no session link. The
+  Claude Code `attribution` project setting that `ship:adopt` writes
+  produces this line. Where that setting is missing, this rule is the
+  user instruction that outranks Claude Code's default footer.
 
 **Example:**
 ```
