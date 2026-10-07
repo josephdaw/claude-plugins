@@ -25,6 +25,28 @@ If `.gitignore` ignores `.claude/` wholesale, narrow it to
 `.claude/settings.local.json` and `.claude/worktrees/` so the shared file
 is committed.
 
+Also merge the attribution setting, so Claude Code writes the plain-text
+footer `land` and `ship-issue` expect instead of its own emoji one:
+
+```json
+{
+  "attribution": { "pr": "Generated with Claude Code", "sessionUrl": false }
+}
+```
+
+Ask first, same question as the ASCII script copy below: this is Joe's
+default, and another user of this repo may not want it. Default yes.
+
+## 1b. The ASCII check script
+
+Ask the same question as the attribution setting above: copy the plugin's
+own script, `<base>/../../scripts/check-ascii.py` (the same
+plugin-relative path convention step 4 and other skills use for
+`rules/coding.md`), into the repo at `.claude/ship/check-ascii.py`,
+executable, overwriting an older copy if one exists. Default yes. The
+header comment in that file says it is copied, not owned, by the repo:
+edit the source in the ship plugin, never the copy.
+
 ## 2. Squash merge defaults
 
 `land`'s auto merge policy squashes with an explicit subject and body, but

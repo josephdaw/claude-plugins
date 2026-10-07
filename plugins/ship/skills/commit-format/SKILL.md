@@ -57,39 +57,85 @@ feat(utils): update encode to support unicode
 **PR description format**
 
 This is also the squash commit body on merge (see `land` and `adopt`), so
-it is the only account of the change that reaches main. Keep it short and
-keep it true for the life of the PR, including after fix rounds.
+it is the only account of the change that reaches main. Keep it under 250
+words and keep it true for the life of the PR, including after fix
+rounds.
 
-Four parts, plain sentences, no asterisk bullets:
+Five headed sections, plain sentences, no bullets (the template uses
+none):
 
-1. What changed, as behaviour a user or caller sees.
-2. How it was tested: the command run, for example the ci gate. No counts.
-3. A line starting `Not verified:` naming each acceptance line or
-   behaviour that no test or executed check proves, and how to check it by
-   hand. Write `Not verified: nothing` only when every acceptance line is
-   proven by a test or a check actually run.
-4. `Closes #N` (or `Refs #N` when the PR does not finish the issue) on its
-   own line.
+```
+## What changes
+2 to 4 sentences on behaviour a user or caller sees. Not internals.
 
-It never holds test counts or other numbers that change as tests or code
-change, and never an account of how the code works inside. The diff shows
-that; a stale number or a paraphrase of the diff is a claim that can go
-false without anyone updating it.
+## Why
+Closes #N. One line on the problem if the issue title does not say it.
+
+## Evidence
+Before: the failing test or observed behaviour.
+After: the same test passing, or the output or screenshot.
+
+## Risk
+Door: one-way or two-way (migrations, data writes, and broker or payment
+calls are one-way).
+Blast radius: what breaks if this is wrong.
+Not verified: what was not checked and how to check it by hand, or
+"nothing" only when every acceptance line is proven by a test or a check
+actually run.
+
+## Where to look
+2 to 5 files in reading order. Mark any moves-only commit.
+
+Generated with Claude Code
+```
+
+Rules:
+
+- Under 250 words.
+- No test or line counts, no review-round history, no session links. The
+  diff shows how the code works inside; a stale number or a paraphrase of
+  the diff is a claim that can go false without anyone updating it.
+- `Not verified:` is a line inside Risk, never its own heading.
+- `Closes #N` (or `Refs #N` when the PR does not finish the issue). With
+  no issue, Why holds the problem line alone and there is no Closes/Refs
+  line.
+- Plain ASCII. The last line is the plain-text attribution line,
+  `Generated with Claude Code`, no emoji, no session link. The Claude Code
+  `attribution` project setting that `ship:adopt` writes produces this
+  automatically; where a user instruction about attribution exists, it
+  outranks Claude Code's own default footer.
+- No asterisk bullets: the template above uses none, so this holds by
+  construction.
 
 **Example:**
 ```
 feat: reject a login when the account is locked
 
+## What changes
 Login now returns 423 with a locked-account message instead of the
 generic 401 when the account's lock flag is set. Callers see the same
 response whether the lock came from repeated failed attempts or an
 admin action.
 
-Tested by running the ci gate.
+## Why
+Closes #142.
 
+## Evidence
+Before: logging in with a locked account returned 401, the same as a
+wrong password.
+After: the same request returns 423 with a locked-account message; ci
+gate passing.
+
+## Risk
+Door: two-way, no migration.
+Blast radius: a bug here would mask account locks as ordinary login
+failures again.
 Not verified: the admin-triggered lock path, since no test seeds an
 admin-set lock. Check by hand: set a user's locked_at from the admin
 console, then attempt that user's login and confirm 423.
 
-Closes #142
+## Where to look
+src/auth/login.ts, src/auth/lockout.ts
+
+Generated with Claude Code
 ```

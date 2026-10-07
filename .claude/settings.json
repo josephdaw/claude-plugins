@@ -3,6 +3,7 @@
     "josephdaw": { "source": { "source": "github", "repo": "josephdaw/claude-plugins" } }
   },
   "enabledPlugins": { "ship@josephdaw": true },
+  "attribution": { "pr": "Generated with Claude Code", "sessionUrl": false },
   "hooks": {
     "SessionStart": [
       { "hooks": [ { "type": "command",

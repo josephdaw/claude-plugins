@@ -37,12 +37,17 @@ Never stop short of the PR out of caution.
 
 7. The spec offers options or leaves a call open: stop and report. Do not
    pick.
-8. The spec is bigger than one PR (model plus API plus UI plus migration in
-   a non-trivial way, or unrelated concerns bundled): stop and reply with a
-   numbered split, one seam per line. Wait.
-9. Something in the spec cannot be proven by code: say so in the PR body
-   under "Not verified" and list exactly what needs a hand check. Never
-   claim a manual check you did not do.
+8. Bigger than one PR: stop and propose a split only when you can name a
+   real seam (`<base>/../../rules/coding.md`, PR scoping: design vs
+   implementation, different test surfaces, a true unblocker, one cohesive
+   auth boundary or migration). Reply with a numbered split, one seam per
+   line, and wait. With no seam it ships as one PR, the same `Scope:` line
+   exception worker.md has: a brief carrying a person's `Scope:` line
+   deciding it ships as one PR means build it as one PR, do not re-propose
+   the split.
+9. Something in the spec cannot be proven by code: say so on the
+   `Not verified:` line inside Risk and list exactly what needs a hand
+   check. Never claim a manual check you did not do.
 
 ## Implement
 
@@ -57,8 +62,15 @@ Never stop short of the PR out of caution.
     changing untested code, write the characterisation test first.
 12. Docs are part of the change: CLAUDE.md maps, conventions, ADRs, or
     whatever surface the repo names.
-13. Keep to the issue. A "while I am here" cleanup goes in a note in the PR
-    body, not in the diff.
+13. Fold in or report, never silently skip. A defect or rule breach you
+    find in code this PR already touches, related to the issue, is fixed
+    in this PR (`<base>/../../rules/coding.md`, "Fix related problems
+    now"). Not in this PR: a change in a file or area the issue does not
+    reach, anything that needs a decision the issue did not make, and a
+    tidy-up unrelated to the issue. Name those in your report as
+    follow-ups, not in the PR body (`ship:commit-format` leaves no room
+    for them there). In a risk-area issue, make the one change only and
+    report the rest the same way.
 
 ## Refactor
 
@@ -81,9 +93,13 @@ Never stop short of the PR out of caution.
 
 17. Commit in Conventional Commits form, `<type>(<scope>): <description>`.
     Match the trailer style of `git log -5`.
-18. Push with `-u`. Open the PR with `gh pr create`. Title in Conventional
-    Commits form. Write the body in the PR description format `ship:commit-format`
-    defines: it is also the squash commit body, so keep to that shape.
+18. Push with `-u`. Write the PR body in the template `ship:commit-format`
+    defines: it is also the squash commit body, so keep to that shape. If
+    the repo has `.claude/ship/check-ascii.py` (or the plugin's own copy),
+    run it on the body file and on any changed docs before opening the
+    PR, `python3 <path> --body-file <file>` and `--files <changed docs>`,
+    and fix any hit first. Open the PR with `gh pr create`. Title in
+    Conventional Commits form.
 19. Report in this shape:
 
 ```
@@ -92,6 +108,7 @@ Branch: <name>
 Worktree: <path>
 Gate: <command> passed | failed (output below)
 Not verified: <list or "nothing">
+Follow-up: <related work found but left out, one line each, or "nothing">
 ```
 
 Leave the worktree in place. The orchestrator removes it after merge.

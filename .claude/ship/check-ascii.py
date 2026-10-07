@@ -1,0 +1,1 @@
+../../plugins/ship/scripts/check-ascii.py

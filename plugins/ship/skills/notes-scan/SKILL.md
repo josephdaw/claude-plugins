@@ -15,10 +15,13 @@ Default window: the last seven days. `--since` overrides. Repo from the
 Harness section of the current checkout, or `--repo`.
 
 - `gh pr list --state merged --search "merged:>=<since>" --json number,title,mergedAt`
-- For each PR, `gh pr view <n> --json comments` and pull every line that
-  starts with `NOTE` from a comment headed `Review by ship:reviewer`.
-- Also collect DEFER lines and confirm each has an issue number. One with
-  none is a review that broke the rule; report it, do not file it here.
+- For each PR, `gh pr view <n> --json comments` and find the comment whose
+  body starts with the `Review: ` first line. Pull every line in its
+  `<details><summary>Notes</summary>` block.
+- Also collect Follow-up lines ("Append to #N" or "Suggest: <title>") and
+  confirm land acted on each (an issue comment or a new issue linking the
+  PR). A Follow-up line nothing acted on is a broken step; report it, do
+  not file it here.
 
 ## 2. Sort
 
@@ -31,7 +34,7 @@ three or more entries across different PRs is a trend.
 - Trend, and the repo has no written rule for it: draft the rule as one
   or two lines for the repo's CLAUDE.md or conventions doc, in the repo's
   voice. Open a PR with only that change. Next week the same finding is a
-  FIX, not a NOTE.
+  Must fix, not a NOTE.
 - Trend, and a rule already exists: the reviewer is under-classifying.
   Say so in the report with the rule quoted. No PR.
 - One-offs worth ten minutes together, all in files nobody has an open PR
@@ -46,7 +49,7 @@ nothing is a good outcome; say so in one line.
 
 ```
 Notes scan <repo> <since> to <today>
-PRs read: <n>   NOTE lines: <n>   DEFER without issue: <n, list>
+PRs read: <n>   NOTE lines: <n>   Follow-up not acted on: <n, list>
 Trends:
 - <group>: <count> across <PRs>. Rule PR #<n> | rule exists: "<quote>"
 Tidy-up PR: #<n> | none
