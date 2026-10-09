@@ -32,9 +32,13 @@ Find the existing owner; do not create a parallel implementation.
 ## Rules
 
 - Versions are never bumped by hand. Release Please reads the
-  Conventional Commit types on main (feat = minor, fix = patch; chore,
-  docs, ci, refactor, test do not release), opens a release PR that bumps
-  `plugin.json` and writes the plugin's CHANGELOG.md, and Joe merges it.
+  Conventional Commit types on main (feat = minor; fix, perf, and revert =
+  patch; chore, docs, ci, refactor, test, style, and build do not
+  release), opens a release PR that bumps `plugin.json` and writes the
+  plugin's CHANGELOG.md, and Joe merges it. A `!` after the type, or the
+  text `BREAKING CHANGE:` or `BREAKING-CHANGE:` anywhere in a squash
+  body, bumps the major, so 0.x becomes 1.0.0. Never write that text in
+  a PR body unless you mean it.
   CHANGELOG.md is generated, never edited by hand. A commit releases a
   plugin only when it touches files under that plugin's directory.
   marketplace.json carries no version; the ci gate fails if one is added.

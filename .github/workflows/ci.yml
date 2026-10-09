@@ -17,5 +17,5 @@ jobs:
           node-version: "22"
       - name: Install Claude Code CLI
         run: npm install -g @anthropic-ai/claude-code
-      - name: Validate manifests and check versions match
+      - name: Validate manifests and check the version convention
         run: ./scripts/ci.sh
