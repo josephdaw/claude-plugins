@@ -16,10 +16,13 @@ Find the existing owner; do not create a parallel implementation.
 
 | Concern | Owner |
 |---------|-------|
-| Marketplace listing and plugin versions | `.claude-plugin/marketplace.json` |
-| ship manifest and version | `plugins/ship/.claude-plugin/plugin.json` |
+| Marketplace listing | `.claude-plugin/marketplace.json` |
+| ship manifest and version (bumped by Release Please) | `plugins/ship/.claude-plugin/plugin.json` |
 | The ci gate | `scripts/ci.sh` |
-| Version match check | `scripts/check-manifest-versions.py` |
+| Version convention check | `scripts/check-manifest-versions.py` |
+| Release config and current versions | `release-please-config.json`, `.release-please-manifest.json` |
+| The release workflow | `.github/workflows/release-please.yml` |
+| Generated changelog per plugin | `plugins/<name>/CHANGELOG.md` |
 | What each ship skill does | `plugins/ship/skills/<name>/SKILL.md` |
 | Worker, reviewer, and spec-test agents | `plugins/ship/agents/<name>.md` |
 | The coding rules every repo is held to | `plugins/ship/rules/coding.md` |
@@ -28,11 +31,19 @@ Find the existing owner; do not create a parallel implementation.
 
 ## Rules
 
-- A change to ship bumps its version in both `plugin.json` and
-  `marketplace.json`. The two must match, and the ci gate fails when they
-  do not. Minor for `feat`, patch for `fix`. Installed copies only update
-  when the version changes. History before 2026-09-12 does not hold to
-  this: 0.3.0 and 0.4.0 shipped while marketplace.json still said 0.2.1.
+- Versions are never bumped by hand. Release Please reads the
+  Conventional Commit types on main (feat = minor, fix = patch; chore,
+  docs, ci, refactor, test do not release), opens a release PR that bumps
+  `plugin.json` and writes the plugin's CHANGELOG.md, and Joe merges it.
+  CHANGELOG.md is generated, never edited by hand. A commit releases a
+  plugin only when it touches files under that plugin's directory.
+  marketplace.json carries no version; the ci gate fails if one is added.
+  History before 2026-09-12 does not hold to this: 0.3.0 and 0.4.0 shipped
+  while marketplace.json still said 0.2.1, which is the reason for this
+  rule.
+- After a release PR merges, installed copies update on the next
+  auto-update, or by running
+  `claude plugin update ship@josephdaw --scope project` in each repo.
 - A rule lives in one skill. Other skills point to it, they do not
   restate it.
 - Skill text is read by agents. Write rules as plain, checkable
@@ -48,11 +59,19 @@ No build. Validate with:
 ./scripts/ci.sh
 ```
 
-That validates the marketplace and every plugin manifest, then checks the
-versions in the two manifests match.
+That validates the marketplace and every plugin manifest, then checks that
+marketplace.json carries no version and that every listed plugin's
+plugin.json has one.
 
 To try a change before release, point a session at this checkout with
 `claude --plugin-dir plugins/ship`.
+
+### Adding a plugin later
+
+Add a `packages` entry in `release-please-config.json` with its own
+`component` and `extra-files` pointing at its plugin.json, and a matching
+entry in `.release-please-manifest.json` with its current version.
+Without a manifest entry, its first release is 1.0.0.
 
 ## Harness
 

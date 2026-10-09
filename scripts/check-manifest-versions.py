@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail when the marketplace entry and the plugin manifest disagree on a version."""
+"""Enforce one version convention: plugin.json only, never marketplace.json."""
 
 import json
 import sys
@@ -13,15 +13,19 @@ def main() -> int:
     listed = json.loads(MARKETPLACE.read_text())["plugins"]
     problems = []
     for entry in listed:
-        manifest = ROOT / entry["source"].lstrip("./") / ".claude-plugin" / "plugin.json"
-        own = json.loads(manifest.read_text())["version"]
-        if own != entry["version"]:
+        if "version" in entry:
             problems.append(
-                f"{entry['name']}: marketplace.json says {entry['version']}, "
-                f"{manifest.relative_to(ROOT)} says {own}"
+                f"{entry['name']}: marketplace.json sets version, but the "
+                "version lives in plugin.json only"
             )
-        else:
-            print(f"{entry['name']}: {own}")
+            continue
+        source = entry["source"].removeprefix("./")
+        manifest = ROOT / source / ".claude-plugin" / "plugin.json"
+        data = json.loads(manifest.read_text())
+        if "version" not in data:
+            problems.append(f"{entry['name']}: {manifest.relative_to(ROOT)} has no version")
+            continue
+        print(f"{entry['name']}: {data['version']}")
     if problems:
         print("\n".join(problems), file=sys.stderr)
         return 1

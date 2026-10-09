@@ -1,0 +1,16 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "579470b46808f39338a27d9442141ddc1a14d4ae",
+  "release-type": "simple",
+  "separate-pull-requests": false,
+  "include-component-in-tag": true,
+  "packages": {
+    "plugins/ship": {
+      "component": "ship",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        { "type": "json", "path": ".claude-plugin/plugin.json", "jsonpath": "$.version" }
+      ]
+    }
+  }
+}
