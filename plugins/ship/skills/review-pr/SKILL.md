@@ -43,8 +43,9 @@ wording itself and moves straight to merge.
   reviewed head. Check each one for two things: is it true, and does it
   hold to the template `ship:commit-format` defines (the five headed
   sections, under 250 words, `Not verified:` inside Risk,
-  `Closes`/`Refs #N` in Why). This full walk happens once, on this round;
-  a re-review after a fix round does not repeat it.
+  `Closes`/`Refs #N` in Why). This full walk happens once, on this round.
+  A re-review after a fix round repeats it only when land says the
+  description changed.
 - `gh issue list --state open --search "<keywords>"` when you are about to
   write a Follow-up, so you append to an existing issue instead of a new
   one.
@@ -72,8 +73,8 @@ reviews are wrong.
    or by reverting locally if a worktree is available. A test that mirrors
    the code is not a test.
 
-   When the PR has a spec-test commit, two checks are mechanical, so do
-   them rather than judge them:
+   When the PR has a spec-test commit, do these checks rather than judge
+   them:
 
    - The test files have not changed since that commit:
      `git diff <test-sha> HEAD -- <test paths>`. Any change is a Must fix
@@ -108,8 +109,8 @@ Skip style unless the repo names the rule.
 ## 3. Post and return
 
 Post one PR comment with `gh pr comment $ARGUMENTS --body-file -`, in this
-shape. Under 400 words, not counting the Notes block. At most two
-sentences per finding. No legend, no "Verified by" lines, no "checked and
+shape. Under 400 words, not counting the Notes block or the replacement
+text in Lander fixes. At most two sentences per finding. No legend, no "Verified by" lines, no "checked and
 fine" list, no TLDR block:
 
 ```
@@ -156,12 +157,14 @@ was proven by a test or a check actually run. Never leave the section out.
 
 ### A re-review (after a worker fix round)
 
-Reads only the fix diff, under 100 words:
+Reads only the fix diff, plus the description when land says it changed.
+Under 100 words, not counting replacement text:
 
 ```
 Review: APPROVE | CHANGES (<who>, <model>) at <short head sha>, fix diff <old sha>..<new sha>
 - Must fix 1: fixed. | still wrong: <one sentence>.
 - <any new Must fix the fix diff introduced, same shape as above>
+- Lander fix: <file:line, or "PR body, <section>">: <exact replacement text>
 ```
 
 ## Must fix, Lander fixes, or Follow-up
@@ -170,7 +173,8 @@ Three outcomes, one owner each. There is no "should fix, not blocking".
 A related fold-in is a Must fix, not a Follow-up, so the worker and
 reviewer get as much as they can into the one PR. In a risk-area PR the
 one-change rule wins: the same finding becomes a Follow-up instead,
-because the worker reports the related fix rather than making it.
+because the worker reports the related fix rather than making it. The
+readiness comment on the issue says which, on its `Risk area:` line.
 
 - Must fix. Wrong, and this PR's to fix. Any size. Tag it `defect` (wrong
   behaviour, or a reader of the merged code would be misled into a wrong
@@ -181,9 +185,6 @@ because the worker reports the related fix rather than making it.
   it is wrong against: an acceptance line, a written repo rule, a
   correctness trace, or a test gap. One that cannot name one is a NOTE,
   not a Must fix. Any Must fix means CHANGES and a fix round clears it.
-  A small related fix in a file the PR already touches is a Must fix (or
-  a Lander fix if it is text), never a Follow-up, unless this is a
-  risk-area PR.
 - Lander fixes. Text only: the PR description, a code comment, a
   docstring, or docs. Give the exact replacement text; if you cannot give
   the exact text, it is not a Lander fix, put it under Must fix instead.

@@ -12,8 +12,8 @@ Usage, one or more modes per run:
                                             and the working tree
   check-ascii.py --files PATH [PATH ...]   check whole files
 
-Reports each hit as `path:line: U+XXXX <name>`. Exits 1 on any hit, exits
-0 and prints nothing (or one "ok" line when run with no hits) when clean.
+Reports each hit as `path:line: U+XXXX <name>` and exits 1. Prints one
+`ok` line and exits 0 when clean.
 """
 
 import argparse
@@ -44,18 +44,27 @@ def added_lines_by_file(diff_output: str) -> dict[str, dict[int, str]]:
     result: dict[str, dict[int, str]] = {}
     current_file = ""
     new_line_no = 0
+    in_header = False
     for raw in diff_output.splitlines():
-        if raw.startswith("+++ "):
-            path = raw[4:]
-            current_file = path[2:] if path.startswith("b/") else path
-            result.setdefault(current_file, {})
+        if raw.startswith("diff --git "):
+            in_header = True
             continue
+        if in_header:
+            # Header lines up to the first hunk: only the +++ path matters.
+            if raw.startswith("+++ "):
+                path = raw[4:]
+                current_file = path[2:] if path.startswith("b/") else path
+            elif raw.startswith("@@"):
+                in_header = False
+            if in_header:
+                continue
         if raw.startswith("@@"):
             # @@ -a,b +c,d @@
             plus_part = raw.split("+", 1)[1].split("@@")[0].strip()
             new_line_no = int(plus_part.split(",")[0])
             continue
-        if raw.startswith("+++") or raw.startswith("---"):
+        if raw.startswith("\\"):
+            # "\ No newline at end of file" is not a line of the file.
             continue
         if raw.startswith("+"):
             result.setdefault(current_file, {})[new_line_no] = raw[1:]

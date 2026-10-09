@@ -41,7 +41,7 @@ plugin's default, and a team may not want it. Default yes.
 
 Ask the same question as the attribution setting above: copy the plugin's
 own script, `<base>/../../scripts/check-ascii.py` (the same
-plugin-relative path convention step 4 and other skills use for
+plugin-relative path convention other skills use for
 `rules/coding.md`), into the repo at `.claude/ship/check-ascii.py`,
 executable, overwriting an older copy if one exists. Default yes. The
 header comment in that file says it is copied, not owned, by the repo:

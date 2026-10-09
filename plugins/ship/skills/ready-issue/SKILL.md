@@ -144,8 +144,8 @@ Checked against the code: <what you actually ran or read, one line>
 
 Blocking:
 1. <what is wrong, the evidence, and what the issue should say instead>
-   When Size is large and no scope decision holds, this is the proposed
-   split: a numbered list of issues, each one `small` or `medium`, in
+   When Size is large, a real seam is named, and no scope decision
+   holds, this is the proposed split: a numbered list of issues, each one `small` or `medium`, in
    landing order, with the seam each one sits on.
 
 Worth fixing:

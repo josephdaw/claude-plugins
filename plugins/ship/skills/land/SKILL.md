@@ -56,8 +56,7 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
    (review-pr's format): APPROVE or CHANGES, Must fix items, Lander fixes,
    Follow-up, Not verified, and a Notes block.
 
-4. Route the findings. CHANGES only when Must fix has an item; Lander
-   fixes alone are APPROVE.
+4. Route the findings. review-pr owns the verdict rule.
 
    Lander fixes (text only: PR description, code comments, docstrings,
    docs). Land applies every one itself, no worker, no re-review, no
@@ -75,8 +74,8 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      with a one-line message naming the finding, and push. Land does
      this itself; it does not dispatch a worker and does not spend a fix
      round.
-   - Land never picks the wording; it only applies the wording the
-     reviewer already gave. No re-review follows a Lander fix: review-pr
+   - Land never picks the wording, except the ASCII swap in step 5; it
+     only applies the wording the reviewer already gave. No re-review follows a Lander fix: review-pr
      already marked these "no re-review" because applying exact given
      text is not a design decision. With no Must fix in the verdict, go
      straight to step 5 once every Lander fix is applied.
@@ -89,19 +88,23 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      `ship:worker`) with: the worktree path and branch from the PR, the
      review comment text, and the same instruction. It works in the
      existing worktree, never a new one.
-   - When it reports, go back to step 1 for CI on the pushed commit, then
-     run a re-review: launch the `ship:reviewer` agent (always `fork`,
-     never `self`, regardless of what step 3 chose) with "Re-review PR
-     <n>. Since your CHANGES review, only commit <old sha>..<new sha>
-     changed. Read that fix diff only, in the re-review shape." Count the
-     round.
+   - When it reports, go back to step 1 for CI on the pushed commit. If
+     no full review has run yet (the round was for red CI), run step 3
+     now instead of a re-review. Otherwise run a re-review: launch the
+     `ship:reviewer` agent (always `fork`, never `self`, regardless of
+     what step 3 chose) with "Re-review PR <n>. Since your CHANGES
+     review, only commit <old sha>..<new sha> changed. Read that fix diff
+     only, in the re-review shape." If the PR's `lastEditedAt` is later
+     than the full review, the worker changed the description: add "The
+     description changed too. Walk it once more." Count the round.
    - Rounds exhausted with CHANGES still standing: stop, report the last
      review, and leave the PR open. Do not merge.
 
    Both kinds present on the same verdict: send the Must fix items to the
    worker first. Apply the Lander fixes only after the re-review of the
    worker's fix diff comes back APPROVE, so the worker does not race the
-   lander editing the same files. Then go straight to step 5; a Lander
+   lander editing the same files. Skip a Lander fix whose text the
+   worker's round already changed. Then go straight to step 5; a Lander
    fix applied after an APPROVE re-review needs no further re-review of
    its own.
 
@@ -142,17 +145,20 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      }' -F owner=<owner> -F repo=<repo> -F n=<n>
    ```
 
-   Find the latest comment whose body starts with the `Review: ` first
-   line and read its `createdAt`. If the PR's `lastEditedAt` is later,
-   the current body must be exactly the body land last wrote with
-   `gh pr edit` in this run. If land made no body edit, or the body
+   Find the latest `Review: ` comment that walked the description: the
+   full review, or a re-review land told to walk it. A plain fix-diff
+   re-review does not count. Read its `createdAt`. If the PR's
+   `lastEditedAt` is later, the current body must be exactly the body
+   land last wrote with `gh pr edit` in this run. If land made no body edit, or the body
    differs from what it wrote, someone else changed the approved text:
    go back to step 3 and re-review the current description.
 
    Then the ASCII check on the PR body, when the repo has a copy of the
    script (`.claude/ship/check-ascii.py`; no copy, skip this check):
    `python3 .claude/ship/check-ascii.py --body-file <the body file>`. A
-   hit is a Lander fix: replace the character the hit names, write the
+   hit is the one Lander fix land words itself: swap the character for
+   its plain-ASCII equivalent (an em dash becomes a comma or full stop,
+   curly quotes become straight quotes, an emoji is removed), write the
    body back, and check again until clean.
 
    Follow-ups: collect every "Append to #N" and "Suggest: <title>" line

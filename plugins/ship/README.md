@@ -141,5 +141,5 @@ against the code. The label is a gate the rest of the pipeline trusts, so
 it is earned by a pass that greps for every symbol the issue names, not by
 someone reading the prose and agreeing with it. The most recent issue
 comment titled "Decisions taken" or "Spec addendum" beats the body. PR
-bodies carry `Closes #N` on its own line. Commit subjects follow Conventional
+bodies carry `Closes #N` in the Why section. Commit subjects follow Conventional
 Commits, checked by the repo, not by this plugin.
