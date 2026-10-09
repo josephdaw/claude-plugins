@@ -9,10 +9,13 @@ ship-issue already puts CLAUDE.md first.
 How Joe wants code work done. These were learned in earlier sessions and
 are repeated here because memory does not carry across workspaces.
 
-- Fix related problems now. Anything found during a task that relates to
-  that task gets fixed in the same PR. Only out of scope work, or work
-  that needs a planning session, becomes an issue. Never leave a
-  should-fix with no owner.
+- Fix related problems now. A defect or rule breach found in code this
+  task already touches, related to the task, gets fixed in the same PR
+  (a fold-in). A change in a file or area the task does not reach, or
+  anything that needs a decision the task did not make, is unrelated: it
+  becomes a follow-up, named in the report, never a silent addition to
+  the diff and never bundled into the PR body. Never leave a should-fix
+  with no owner.
 - Deliver the outcome Joe pictured. Say the end state in his words and
   check the plan reaches it. If a simple manual step gets there today
   and the engineered path gets there next week, offer the simple one
@@ -76,7 +79,7 @@ are repeated here because memory does not carry across workspaces.
 - Ratchet: each repo keeps a baseline of the files and functions over a
   cap on the day the check is added, at their size that day. A baselined
   entry may shrink or be removed, never grow. A new breach fails. A PR
-  that raises a baseline number is a FIX. Checked by a test where the
+  that raises a baseline number is a Must fix. Checked by a test where the
   repo's tool can measure growth, otherwise by review.
 - Imports go one way. Each repo writes its layer order in its CLAUDE.md.
   Checked by a test or lint rule.
@@ -91,8 +94,9 @@ are repeated here because memory does not carry across workspaces.
 - Logic takes data and returns data. Reading and writing (files, network,
   clock, environment) happens at the edges. Tests stub only those edges,
   so code can move without rewriting tests. Checked by review.
-- A change that would push a file past its cap splits the file first, as
-  its own PR. Checked at spec time.
+- A change that would push a file past its cap splits the file as the
+  first commit of the same PR, moves only, tests unchanged. Checked at
+  spec time.
 
 Each repo enforces the test-checked rules with its own native tools. The
 rules file says what is checked, not how.
@@ -137,14 +141,14 @@ Do not split when the pieces are the same surface done in sequence. Absorbing ac
 
 Smells that a split is too granular: a PR that cannot be meaningfully tested without its siblings; PRs that must merge in a fixed order to make sense; a "delete the old thing" PR separated from the "build the replacement" PR; relabelling or copy split out from the change that introduced it; more than a couple of PRs all editing the same file.
 
-Smells that a PR is too big: defining new vocabulary and consuming it in unrelated places in the same change; doing an audit and all the fixes it uncovers in one change; stapling an opportunistic "while we are here" cleanup onto something otherwise cohesive.
+Smells that a PR is too big: defining new vocabulary and consuming it in unrelated places in the same change; doing an audit and all the fixes it uncovers in one change; stapling an unrelated "while we are here" cleanup onto something otherwise cohesive. A related fix in code the PR already touches is not this smell: it is a fold-in ("Fix related problems now" above).
 
 Process:
 - Before agreeing on the work, lay out the proposed PRs as a numbered list, naming the seam each one sits on. Confirm the split before opening anything. If you cannot name the seam, it is one PR.
 - Order any split so the smaller pieces unblock the larger one. Tight plumbing first, surface second.
 - One PR per issue. When work needs more than one PR, write one issue per PR so nothing gets dropped between merges.
 - Do not create parent "epic" issues. They clutter the issue list and do not reliably get closed when the work is done. Carry the overall context in the first issue of the sequence (or a companion doc when the scope warrants) and cross-link the sibling issues from each body.
-- Every issue must be detailed enough that a worker agent can ship it from the issue body alone, with no follow-up prompt. Include file paths, line numbers, contract changes, test plan, and acceptance criteria. If background genuinely will not fit inline (a design doc, a long migration plan, a data audit), create a companion `.md` in the repo and link it. Do not create the companion file by default.
+- Every issue must be detailed enough that a worker agent can ship it from the issue body alone, with no follow-up prompt. Include file paths, line numbers, contract changes, and acceptance criteria a reviewer can walk line by line. Do not include a prescribed test list: a spec-test pass enumerates the cases, and its value is finding the ones nobody thought of (`ship:raise-issue` and `ship:ready-issue` own this rule in full). If background genuinely will not fit inline (a design doc, a long migration plan, a data audit), create a companion `.md` in the repo and link it. Do not create the companion file by default.
 
 
 - Use TodoWrite for task management on complex tasks

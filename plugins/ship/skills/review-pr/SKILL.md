@@ -2,7 +2,7 @@
 name: review-pr
 description: The review checklist. Review one pull request against its issue spec and the repo's rules, post findings on the PR, and return APPROVE or CHANGES. Runs in whatever context calls it: inline in the orchestrator for a small diff, or inside the ship:reviewer agent (opus, fresh context) for anything larger or riskier. Use when asked to review a PR or as the review step of land.
 argument-hint: <pr-number>
-allowed-tools: Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh pr checks:*), Bash(gh pr review:*), Bash(gh pr comment:*), Bash(gh issue view:*), Bash(git:*), Bash(pnpm:*), Bash(npm:*), Read, Grep, Glob
+allowed-tools: Bash(gh pr view:*), Bash(gh pr diff:*), Bash(gh pr checks:*), Bash(gh pr comment:*), Bash(gh issue view:*), Bash(gh issue list:*), Bash(git:*), Bash(pnpm:*), Bash(npm:*), Read, Grep, Glob
 ---
 
 Review PR #$ARGUMENTS. A cheaper model wrote it. Find what is wrong before a
@@ -11,6 +11,13 @@ merge does.
 If you are the orchestrator reviewing inline, you share context with the
 brief you wrote. Read the diff as a stranger would: start from the issue's
 acceptance criteria, not from what you expected the worker to do.
+
+One review round per PR. This skill reviews the whole PR once. A second
+pass happens only after a worker fix round that changed code, and that
+pass reads only the fix diff, in the shorter re-review shape at the end of
+section 3. A text-only finding (the PR description, a code comment, a
+docstring, or docs) never earns a re-review: `/ship:land` applies the
+wording itself and moves straight to merge.
 
 ## 1. Load the spec and the rules
 
@@ -34,23 +41,31 @@ acceptance criteria, not from what you expected the worker to do.
   in full. A diff hides the function around the change.
 - Walk every sentence of the PR description against the code at the
   reviewed head. Check each one for two things: is it true, and does it
-  hold to the four-part shape `ship:commit-format` defines (what changed,
-  how it was tested, a "Not verified" line, `Closes`/`Refs #N`). Do this
-  on every review, including a re-review after a fix round: walk the whole
-  description again, not only the sentences that changed.
+  hold to the template `ship:commit-format` defines (the five headed
+  sections, under 250 words, `Not verified:` inside Risk,
+  `Closes`/`Refs #N` in Why). This full walk happens once, on this round.
+  A re-review after a fix round repeats it only when land says the
+  description changed.
+- `gh issue list --state open --search "<keywords>"` when you are about to
+  write a Follow-up, so you append to an existing issue instead of a new
+  one.
 
 Prefer running something over reasoning about it. If a claim can be checked
 by executing it, execute it: read the installed dependency's source rather
 than recalling its semantics, run the schema against the input the spec
-names, reproduce the failing job locally. State which findings you verified
-by running and which you reasoned about, because the second kind is where
+names, reproduce the failing job locally. A claim you reasoned about but
+did not run goes on the Not verified list, because that kind is where
 reviews are wrong.
 
 ## 2. Judge, in this order
 
 1. Spec. Walk the acceptance criteria one by one. Each is met, partly met,
-   or missing. Scope creep counts against: a change the issue did not ask
-   for is a finding.
+   or missing. A related fold-in is welcome and expected, not scope creep:
+   a small related fix in a file the PR already touches is the fold-in
+   rule working (rules/coding.md, "Fix related problems now"). An
+   unrelated change, one that needed a decision the issue did not make or
+   that touches a file or area the issue does not reach, is a [spec] Must
+   fix.
 2. Correctness. Trace the main path and the edge each criterion implies.
    Empty input, a missing row, a second call, a permission denied.
 3. Tests. Does each behaviour have a test named for the behaviour? Would the
@@ -58,11 +73,11 @@ reviews are wrong.
    or by reverting locally if a worktree is available. A test that mirrors
    the code is not a test.
 
-   When the PR has a spec-test commit, two checks are mechanical, so do
-   them rather than judge them:
+   When the PR has a spec-test commit, do these checks rather than judge
+   them:
 
    - The test files have not changed since that commit:
-     `git diff <test-sha> HEAD -- <test paths>`. Any change is a FIX
+     `git diff <test-sha> HEAD -- <test paths>`. Any change is a Must fix
      unless the PR body records that the orchestrator approved it and why.
      An implementer that edits the tests to pass has removed the guarantee,
      and a green suite then means nothing.
@@ -74,16 +89,16 @@ reviews are wrong.
      them, confirm they fail for the absence of the behaviour rather than a
      missing import. This turns "would it fail if reverted" from a guess
      into evidence, so do not skip it because the tests are green now.
-   - When the PR has a spec-test commit and you raise a FIX for a
+   - When the PR has a spec-test commit and you raise a Must fix for a
      behaviour those tests did not cover, also add a NOTE starting
-     `spec-tests missed:` naming the behaviour, so land's NOTE line
-     carries the count delegate step 3b asks for.
+     `spec-tests missed:` naming the behaviour, in the Notes block
+     (delegate step 3b reads it from there for its count).
 4. Rules. The repo's stated ones, plus the Structure rules in the coding
    rules file: dependency direction, file size, where authorisation
    lives, no logging of personal data, config in the database, and
    whatever else the repo's CLAUDE.md says. On Structure, a duplicated
    owner, a module missing from the ownership map, an import going the
-   wrong way, a cap breach, or a raised ratchet baseline is a FIX.
+   wrong way, a cap breach, or a raised ratchet baseline is a Must fix.
 5. Safety. Secrets in the diff, a migration that drops human-made data,
    a new route left open, participant or staff data reaching a log.
 6. Docs. The repo's maps and conventions updated where the change moved
@@ -94,96 +109,115 @@ Skip style unless the repo names the rule.
 ## 3. Post and return
 
 Post one PR comment with `gh pr comment $ARGUMENTS --body-file -`, in this
-shape, plain sentences, no asterisk bullets:
+shape. Under 400 words, not counting the Notes block or the replacement
+text in Lander fixes. At most two sentences per finding. No legend, no "Verified by" lines, no "checked and
+fine" list, no TLDR block:
 
 ```
-Review by ship:reviewer
+Review: APPROVE | CHANGES (<who>, <model>) at <short head sha>
+Spec: <n> of <m> criteria met. <Name any partly met or missing.>
 
-Verdict: APPROVE | CHANGES
+Must fix (blocks merge)
+1. [defect|test|spec] <file:line>. <What is wrong.> <What to do.>
 
-TLDR
-Verified by running: <the claims you executed, one line>
-Verified by reading: <the claims you traced but did not execute>
-Not verified: <what nobody has checked, and what would check it>
-Merge risk if wrong: <one sentence on what breaks in production>
+Lander fixes (no re-review)
+- <file:line, or "PR body, <section>">: <the exact replacement text>
 
-Spec: <n of m criteria met; name any partly met or missing>
+Follow-up
+- Append to #<N>: <one line>
+- Suggest: <title>. <one line on why it waits>
 
-Findings. Each is FIX, DEFER, or NOTE. Any FIX means CHANGES:
-1. FIX <file:line> <what is wrong> <the acceptance line, repo rule, or
-   trace it fails> <what to do>
-2. DEFER #<issue> <one line on why it is not this PR's to fix>
-3. NOTE <one line, no file:line needed>
+Not verified
+- <one line each: what nobody checked, and how to check it by hand>
 
-Checked and fine: <one line naming the risky parts you traced and found
-sound, so the human knows what was covered>
+<details><summary>Notes</summary>
+
+- <one NOTE per line>
+
+</details>
 ```
 
-The TLDR is written for someone who will not read the rest and will merge
-on it. Keep it to those four lines. "Not verified" is the most valuable of
-them: say plainly what no one has checked, because a reader who is not
-reading the code themselves has no other way to know. Never leave it empty
-to look thorough. If everything really was verified, say so and name how.
+`<who>` is `ship:reviewer` when the agent runs it, `inline` when the
+orchestrator reviews in its own context. `<model>` is the model that
+reviewed (opus, fable, sonnet). The first line always starts `Review: `.
+`land` and `notes-scan` find reviews by that first line, so never alter
+its shape.
 
-## FIX, DEFER, or NOTE
+Verdict: CHANGES when Must fix has any item. Lander fixes alone do not
+block: the verdict is APPROVE, and `/ship:land` applies them before
+merge.
 
-Three labels, one owner each. There is no "should fix, not blocking".
-Deferring work that belongs to this PR grows the backlog, so the default
-is FIX, and the worker and reviewer get as much as they can into the one
-PR.
+Omit an empty Must fix, Lander fixes, or Follow-up section. The Notes
+block appears only when there are notes.
 
-- FIX. Wrong, and this PR's to fix. Any size. Every FIX names what it is
-  wrong against: an acceptance line, a rule the repo has written down, a
-  correctness trace, or a test gap. A FIX that cannot name one is a NOTE.
-  Any FIX means the verdict is CHANGES and the fix round clears it.
-  When the FIX is against the PR description, or against a comment or a
-  docstring, and no code change is needed, give the correct wording in
-  the finding itself, not just what is wrong. `/ship:land` applies a FIX
-  in that shape itself, without spending a worker round, but only when it
-  has the wording to apply; leaving it out sends the finding to a worker
-  as an ordinary fix round.
-- DEFER. Real, but out of scope for this issue or in need of a decision
-  the issue did not make. You create the issue before you post the review:
-  `gh issue create` with a title, a body written from the finding, and a
-  link to the PR. The review carries the issue number. A DEFER without an
-  issue number is an incomplete review.
-- NOTE. Not wrong. Taste, a nicer name, tighter wording, ordering. One
-  short list at the end. Nothing happens to it now; a weekly scan over
-  merged PRs looks for trends.
+Not verified is still the most valuable line for a reader who will not
+read the rest and will merge on it: say plainly what nobody checked and
+how to check it by hand. Write "nothing" only when every acceptance line
+was proven by a test or a check actually run. Never leave the section out.
+
+### A re-review (after a worker fix round)
+
+Reads only the fix diff, plus the description when land says it changed.
+Under 100 words, not counting replacement text:
+
+```
+Review: APPROVE | CHANGES (<who>, <model>) at <short head sha>, fix diff <old sha>..<new sha>
+- Must fix 1: fixed. | still wrong: <one sentence>.
+- <any new Must fix the fix diff introduced, same shape as above>
+- Lander fix: <file:line, or "PR body, <section>">: <exact replacement text>
+```
+
+## Must fix, Lander fixes, or Follow-up
+
+Three outcomes, one owner each. There is no "should fix, not blocking".
+A related fold-in is a Must fix, not a Follow-up, so the worker and
+reviewer get as much as they can into the one PR. In a risk-area PR the
+one-change rule wins: the same finding becomes a Follow-up instead,
+because the worker reports the related fix rather than making it. The
+readiness comment on the issue says which, on its `Risk area:` line.
+
+- Must fix. Wrong, and this PR's to fix. Any size. Tag it `defect` (wrong
+  behaviour, or a reader of the merged code would be misled into a wrong
+  result; red CI; a safety finding), `test` (a behaviour the PR adds or
+  changes that no test proves, or a test that would still pass with the
+  change reverted), or `spec` (an acceptance line not met, or a change
+  unrelated to the issue that is not a fold-in). Each finding names what
+  it is wrong against: an acceptance line, a written repo rule, a
+  correctness trace, or a test gap. One that cannot name one is a NOTE,
+  not a Must fix. Any Must fix means CHANGES and a fix round clears it.
+- Lander fixes. Text only: the PR description, a code comment, a
+  docstring, or docs. Give the exact replacement text; if you cannot give
+  the exact text, it is not a Lander fix, put it under Must fix instead.
+  A broken "never" rule in text (for example test counts in the PR body)
+  is a Lander fix, not a NOTE. `/ship:land` edits these itself with no
+  worker round and no re-review.
+- Follow-up. Only work that needs a decision the issue did not make, or
+  that sits in another area (a file or module the PR does not touch,
+  another owner). Before writing one, check open issues
+  (`gh issue list --state open --search "<keywords>"`). Write
+  "Append to #N" when one fits, "Suggest: <title>" with one line on why
+  it waits when none does. You never run `gh issue create`, `edit`, or
+  `comment`; `/ship:land` is the only step that writes to an issue.
 
 The test: would a reader of the merged code be misled, or would a user or
-operator see a wrong result? Yes is FIX. No, but the codebase is worse off
-in a way another issue should own: DEFER. Neither: NOTE.
+operator see a wrong result? Yes is Must fix (or a Lander fix if the fix
+is an exact piece of text). No, but the codebase is worse off in a way
+another decision or area should own: Follow-up. Neither: NOTE.
 
-FIX includes things that used to slide as "not blocking":
-
-- A false claim in a comment or PR body (a version number that is not the
-  installed one, an issue number that credits the wrong PR, a test count,
-  or a described behaviour the code does not have). False documentation
-  misleads the next reader, so it is a defect. A PR description sentence
-  that is true but does not hold to the `ship:commit-format` shape (for
-  example it counts tests, or it is a bullet point) is a NOTE, not a FIX:
-  it misleads nobody, so it does not cost the worker a round.
-- A log line that misleads an operator.
-- Output that drops data under a shape the spec covers.
-- A written repo rule broken: prose style, dependency direction, file
-  size the PR made worse.
-- A test that does not test the thing: it would pass with the change
-  reverted, or it calls the unit directly instead of driving the path the
-  spec names.
-- A missing test for a behaviour the acceptance names.
-- An acceptance criterion not met, red CI, a safety finding, scope the
-  issue did not ask for, and anything that defeats the issue's purpose
-  even if the code is not defective. Name the issue's purpose in one
-  sentence before you classify anything, and judge against it.
-
-DEFER, for example: a defect the PR exposed but did not cause, in code it
-did not touch; a design question the issue left open; anything that would
-widen the PR past one coherent change.
+Must fix includes things that used to slide as "not blocking": a log line
+that misleads an operator, output that drops data under a shape the spec
+covers, a written repo rule broken (dependency direction, a file size the
+PR made worse), a test that does not test the thing (it would pass with
+the change reverted, or it calls the unit directly instead of driving the
+path the spec names), a missing test for a behaviour the acceptance
+names, red CI, a safety finding, and an unrelated change that is not a
+fold-in.
 
 NOTE, for example: a name that could be better; wording that is correct
 but could be tighter; a pattern you prefer where the repo has no stated
-rule.
+rule. One short line each, in the Notes block. Nothing happens to a NOTE
+now; a weekly scan over merged PRs looks for trends.
 
-You never apply a FIX yourself. The worker does, and you review the new
-head. Reviewing your own fix is not a review.
+You never apply a finding yourself, of any kind. The worker applies a
+Must fix and you re-review the fix diff; `/ship:land` applies a Lander
+fix without a re-review. Reviewing your own fix is not a review.

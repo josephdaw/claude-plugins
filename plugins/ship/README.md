@@ -13,9 +13,12 @@ and land it under the repo's merge policy.
 /ship:delegate 164 171        orchestrator: brief each issue, make a worktree,
                               spec tests first, then launch a worker
     /ship:spec-tests 164      opus: failing behaviour tests, committed alone
-    /ship:ship-issue 164      worker: make them pass, add its own coverage
-/ship:land 167                orchestrator: CI, review, fix loop, re-review,
-                              then merge or hand to a human, then clean up
+    /ship:ship-issue 164      worker: make them pass, add its own coverage,
+                              fold in related fixes, report follow-ups
+/ship:land 167                orchestrator: CI, one review round, apply
+                              lander fixes itself, fix round + re-review
+                              only for a Must fix, then merge or hand to a
+                              human, raise or append follow-ups, clean up
 ```
 
 The two ends of that loop are the ones people skip and the ones that cost
@@ -28,15 +31,15 @@ Each piece also stands alone:
 | Skill | Who runs it | What it does |
 |-------|-------------|--------------|
 | `raise-issue` | author | Write an issue a spec-test pass and a worker can act on: problem, evidence, behaviour, acceptance, known regressions |
-| `ready-issue` | reviewer | Check an issue against the codebase, flag what is wrong, apply the `ready` label |
+| `ready-issue` | reviewer | Check an issue against the codebase, flag what is wrong, apply the `ready` label, or `FOLD INTO #X` when it is too small to stand alone |
 | `brief` | orchestrator | Turn an issue into a worker brief, with a prose-only readiness backstop |
-| `ship-issue` | worker | Brief to open PR: worktree, tests, code, docs, commit, push |
-| `review-pr` | reviewer agent | Judge a PR against the spec and the repo's rules, post findings as FIX, DEFER (issue created), or NOTE, return a verdict |
-| `land` | orchestrator | Wait for CI, run review-pr, apply a text-only FIX's given wording itself or route FIX back to the worker, re-review, merge or hand over, clean up |
+| `ship-issue` | worker | Brief to open PR: worktree, tests, code, docs, fold in related fixes, commit, push |
+| `review-pr` | reviewer agent | One review round against the spec and the repo's rules, post findings as Must fix, Lander fixes (text, applied by land), or Follow-up (append to an issue or suggest one), return a verdict |
+| `land` | orchestrator | Wait for CI, run review-pr once, apply every Lander fix itself, route a Must fix to a worker and re-review only the fix diff, merge or hand over, append or raise follow-ups, clean up |
 | `delegate` | orchestrator | brief + worktree + launch, for one or many issues |
-| `notes-scan` | Talos weekly, a routine, or anyone | Read the NOTE lines on the week's merged PRs, turn a trend into a written rule, at most one tidy-up PR |
-| `adopt` | anyone | Set a repo up: settings.json, squash merge defaults, and the `## Harness` section |
-| `commit-format` | anyone | Release Please conventional commit and PR description format |
+| `notes-scan` | Talos weekly, a routine, or anyone | Read the Notes block on the week's merged PRs, turn a trend into a written rule, at most one tidy-up PR |
+| `adopt` | anyone | Set a repo up: settings.json, attribution setting, the ASCII check script, squash merge defaults, and the `## Harness` section |
+| `commit-format` | anyone | Release Please conventional commit and the fixed PR description template |
 | `worktree` | anyone | Create a worktree in any repo, handling env files; delegate's fallback when there is no worktree script |
 
 | Agent | Model | Used by |
@@ -88,8 +91,14 @@ and the default it uses when the row is absent.
 `/ship:adopt` does all of this. The checklist, for reading or for doing by
 hand:
 
-1. `.claude/settings.json` declares the marketplace and enables the plugin
-   (the JSON block above the Harness table in adopt). Committed, not local.
+1. `.claude/settings.json` declares the marketplace, enables the plugin,
+   and sets the `attribution` setting so Claude Code writes the plain-text
+   footer `Generated with Claude Code` instead of its own emoji one (the
+   JSON block above the Harness table in adopt). Committed, not local.
+1b. `.claude/ship/check-ascii.py`, a copy of the plugin's plain-ASCII
+   check, executable. `ship-issue` runs it on the PR body and changed
+   docs before opening a PR; `land` runs it on the PR body before merge.
+   Free, no CI workflow.
 2. The repo's squash merge defaults, `squash_merge_commit_title` and
    `squash_merge_commit_message`, set to `PR_TITLE` and `PR_BODY`. Without
    this, a human merging from the GitHub UI stitches every branch commit
@@ -117,11 +126,13 @@ copy, config, dependency bump, a `docs` or `chore` label), sonnet for
 anything with behaviour to prove. `--model` forces it. The pick is printed
 so a wrong rule gets fixed here rather than overridden each time.
 
-Review: `review-pr` is one checklist. land runs it in one of two places.
-`fork` launches the `reviewer` agent on opus in a fresh context, the
-default. `self` runs it inline in the orchestrator, chosen only for a small
-diff that touches nothing risky, because an inline review shares the
-blind spots of the session that briefed the work. `--review` forces either.
+Review: `review-pr` is one checklist, run once per PR. land runs it in one
+of two places. `fork` launches the `reviewer` agent on opus in a fresh
+context, the default. `self` runs it inline in the orchestrator, chosen
+only for a small diff that touches nothing risky, because an inline
+review shares the blind spots of the session that briefed the work.
+`--review` forces either. A fix round gets a second pass, but that pass
+reads only the fix diff, never the whole PR again.
 
 ## Conventions the skills assume
 
@@ -130,5 +141,5 @@ against the code. The label is a gate the rest of the pipeline trusts, so
 it is earned by a pass that greps for every symbol the issue names, not by
 someone reading the prose and agreeing with it. The most recent issue
 comment titled "Decisions taken" or "Spec addendum" beats the body. PR
-bodies carry `Closes #N` on its own line. Commit subjects follow Conventional
+bodies carry `Closes #N` in the Why section. Commit subjects follow Conventional
 Commits, checked by the repo, not by this plugin.

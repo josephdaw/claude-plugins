@@ -48,8 +48,10 @@ Every one of these is a command, not a judgement. Run them.
 - For each file the issue names, the current line count, against the
   file cap the coding rules file and the repo's CLAUDE.md set. Flag any
   file already at 85 percent of the cap or more. If the issue's change
-  will grow a flagged file, the split is raised first as its own issue,
-  and this issue waits on it.
+  will grow a flagged file, name the file in the readiness comment and
+  the split happens as the first commit of the same PR, moves only,
+  tests unchanged. This issue does not wait on it, and it is not raised
+  as its own issue.
 
 ## 3. Check it is one deliverable, and size it
 
@@ -84,15 +86,18 @@ Every one of these is a command, not a judgement. Run them.
 - A risk-area issue carries one behaviour change and nothing else: no
   bundled refactor, no second fix, no tidy-up. If it bundles other work it
   is NOT READY. Propose moving the extra work to its own issue. This holds
-  even when a scope decision (below) is recorded.
-- A `large` issue with no recorded scope decision (below) is NOT READY,
-  regardless of how the other checks in this skill come out, and does not
-  get the ready label. Name the seams
-  it splits on (design vs implementation, different test surfaces, an
-  unblocker the rest depends on) and propose the split in the readiness
-  comment as a numbered list of issues, each one `small` or `medium`, in
-  landing order. The author decides on the split and raises the new
-  issues; this skill does not create them.
+  even when a scope decision (below) is recorded. A moves-only cap split
+  as the first commit (step 2) is not a second change: it changes no
+  behaviour and is reviewed as its own commit.
+- A `large` issue is NOT READY for its size only when you can name a
+  real seam it splits on (`<base>/../../rules/coding.md`, PR scoping:
+  design vs implementation, different test surfaces, an unblocker the
+  rest depends on). With a real seam named, propose the split in the
+  readiness comment as a numbered list of issues, each one `small` or
+  `medium`, in landing order, and this issue is NOT READY until the
+  author decides. With no real seam to name, a `large` issue stays one PR
+  and can be READY on its size alone; say so. The author decides on any
+  split and raises the new issues; this skill does not create them.
 - A recorded scope decision holds. When the body or a comment has a line
   starting `Scope:` that records a person's decision to ship the issue as
   one PR, naming who decided, when, and why, do not propose a split for
@@ -103,9 +108,8 @@ Every one of these is a command, not a judgement. Run them.
   fixing. No ship skill or agent writes a Scope line on its own
   judgement. Only these facts reopen the decision, whether or not the
   Scope line already mentions them: risk-area behaviour bundled with
-  other work (the bullet above), a design choice not yet made, or a file
-  step 2 flags that the change will grow (a scope decision does not waive
-  step 2's split-first rule). Name the fact.
+  other work (the bullet above) or a design choice not yet made. Name
+  the fact.
 - The size is a fact about the issue's shape, not a model pick. Delegate
   step 2a reads it when it chooses the worker model; ready-issue does not
   pick the model.
@@ -128,7 +132,7 @@ Post one comment on the issue with what you found, in plain sentences:
 ```
 Readiness review
 
-Verdict: READY | NOT READY
+Verdict: READY | NOT READY | FOLD INTO #X
 
 Size: small | medium | large
 
@@ -140,8 +144,8 @@ Checked against the code: <what you actually ran or read, one line>
 
 Blocking:
 1. <what is wrong, the evidence, and what the issue should say instead>
-   When Size is large and no scope decision holds, this is the proposed
-   split: a numbered list of issues, each one `small` or `medium`, in
+   When Size is large, a real seam is named, and no scope decision
+   holds, this is the proposed split: a numbered list of issues, each one `small` or `medium`, in
    landing order, with the seam each one sits on.
 
 Worth fixing:
@@ -156,6 +160,12 @@ On READY, apply the label: `gh issue edit $ARGUMENTS --add-label ready`.
 On NOT READY, do not label, and do not fix the issue yourself unless the
 correction is a fact you verified, such as a renamed symbol or a wrong line
 number. Behaviour and scope are the author's to decide.
+
+On FOLD INTO #X: the issue is too small to carry its own PR, a change of
+a few lines in files an open issue or open PR already changes, or one
+with no value shipped on its own. Name #X and the exact lines to carry
+over in the comment. Do not label either issue and do not close either
+issue; the author folds it in, the same as a split is theirs to act on.
 
 Never label ready an issue you have not checked against the code. The label
 is the gate the whole pipeline trusts, and a label applied on a reading of

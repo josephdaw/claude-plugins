@@ -6,3 +6,7 @@ set -euo pipefail
 claude plugin validate .
 claude plugin validate plugins/ship
 python3 "$(dirname "$0")/check-manifest-versions.py"
+
+# shellcheck disable=SC2046
+python3 "$(dirname "$0")/../plugins/ship/scripts/check-ascii.py" \
+  --files $(git ls-files '*.md' '*.json' '*.sh' '*.py')
