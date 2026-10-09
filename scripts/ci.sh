@@ -1,8 +1,10 @@
 #!/bin/bash
-# The ci gate. Validates the marketplace and each plugin manifest, then
-# checks marketplace.json and every plugin.json agree on the version.
+# The ci gate. Validates the marketplace and every plugin manifest, then
+# checks marketplace.json carries no version and every plugin.json has one.
 set -euo pipefail
 
 claude plugin validate .
-claude plugin validate plugins/ship
+for plugin_dir in plugins/*/; do
+  claude plugin validate "${plugin_dir%/}"
+done
 python3 "$(dirname "$0")/check-manifest-versions.py"
