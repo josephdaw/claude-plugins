@@ -95,8 +95,9 @@ default branch, and ci gate. Missing: stop and say to run `/ship:adopt`.
      what step 3 chose) with "Re-review PR <n>. Since your CHANGES
      review, only commit <old sha>..<new sha> changed. Read that fix diff
      only, in the re-review shape." If the PR's `lastEditedAt` is later
-     than the full review, the worker changed the description: add "The
-     description changed too. Walk it once more." Count the round.
+     than the latest review that walked the description (step 5 names
+     it), the worker changed the description: add "The description
+     changed too. Walk it once more." Count the round.
    - Rounds exhausted with CHANGES still standing: stop, report the last
      review, and leave the PR open. Do not merge.
 
